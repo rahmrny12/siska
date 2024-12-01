@@ -4,23 +4,14 @@
  */
 package View;
 
-import Component.Transaction.MenuPanel;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
+import Model.Menu;
+import Model.OrderItem;
+import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -28,9 +19,9 @@ import javax.swing.SwingUtilities;
  */
 public class FormTransaksi extends javax.swing.JFrame {
 
-    private JTextArea orderSummary;
-    private JLabel totalLabel;
-    private int totalPrice = 0;
+    private Connection conn;
+    
+    private List<Menu> dataMenu = new ArrayList<>();
     
     /**
      * Creates new form FormTransaksi
@@ -38,24 +29,23 @@ public class FormTransaksi extends javax.swing.JFrame {
     public FormTransaksi() {
         initComponents();
         
+        conn = Helper.Database.OpenConnection();
+        
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         
-        orderSummary = leftPanel.getOrderSummary();
-        totalLabel = leftPanel.getTotalLabel();
-        System.out.println(orderSummary);
+        leftPanel.setFormTransaksi(this);
         
-        menuList.setMenuActionListener((String itemName, int itemPrice) -> {
-            // Aksi ketika item ditambahkan
-            System.out.println(itemName + " " + itemPrice);
-
-            // Update order summary
-            orderSummary.append(itemName + " - Rp. " + itemPrice + "\n");
-
-            // Update total price
-            totalPrice += itemPrice;
-            totalLabel.setText("Total: Rp. " + totalPrice);
-
-            System.out.println(totalPrice);
+        loadDataMenu();
+        
+        menuList.setMenuActionListener((int id) -> {
+            Menu selectedMenu = null;
+            for (Menu menu : dataMenu) {
+                if (menu.getId() == id) {
+                    selectedMenu = menu;
+                }
+            }
+            
+            leftPanel.addOrderItem(selectedMenu.getId(), selectedMenu.getNamaMenu(), selectedMenu.getHarga());
         });
     }
 
@@ -69,14 +59,18 @@ public class FormTransaksi extends javax.swing.JFrame {
     private void initComponents() {
 
         menuPanel = new javax.swing.JPanel();
-        btnToMenu = new javax.swing.JButton();
+        btnToTransaksi = new javax.swing.JButton();
         btnToUser = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
+        transaksi = new javax.swing.JPanel();
         topPanel = new Component.Transaction.TopPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         menuList = new Component.Transaction.MenuPanel();
         leftPanel = new Component.Transaction.LeftPanel();
+        riwayatTransaksi = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 51, 51));
@@ -84,20 +78,20 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         menuPanel.setBackground(new java.awt.Color(255, 255, 255));
 
-        btnToMenu.setBackground(new java.awt.Color(198, 40, 40));
-        btnToMenu.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnToMenu.setForeground(new java.awt.Color(255, 255, 255));
-        btnToMenu.setText("Data Menu");
-        btnToMenu.addActionListener(new java.awt.event.ActionListener() {
+        btnToTransaksi.setBackground(new java.awt.Color(198, 40, 40));
+        btnToTransaksi.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnToTransaksi.setForeground(new java.awt.Color(255, 255, 255));
+        btnToTransaksi.setText("Transaksi");
+        btnToTransaksi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToMenuActionPerformed(evt);
+                btnToTransaksiActionPerformed(evt);
             }
         });
 
         btnToUser.setBackground(new java.awt.Color(198, 40, 40));
         btnToUser.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         btnToUser.setForeground(new java.awt.Color(255, 255, 255));
-        btnToUser.setText("Data User");
+        btnToUser.setText("Riwayat Transaksi");
         btnToUser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnToUserActionPerformed(evt);
@@ -120,10 +114,10 @@ public class FormTransaksi extends javax.swing.JFrame {
             menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(menuPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnToMenu)
+                .addComponent(btnToTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnToUser)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 437, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnLogout)
                 .addContainerGap())
         );
@@ -132,41 +126,76 @@ public class FormTransaksi extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, menuPanelLayout.createSequentialGroup()
                 .addContainerGap(16, Short.MAX_VALUE)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnToMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnToTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnToUser, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         mainPanel.setBackground(new java.awt.Color(144, 2, 2));
+        mainPanel.setLayout(new java.awt.CardLayout());
 
         jScrollPane1.setViewportView(menuList);
 
-        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
-        mainPanel.setLayout(mainPanelLayout);
-        mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(leftPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(topPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
-                .addContainerGap())
+        javax.swing.GroupLayout transaksiLayout = new javax.swing.GroupLayout(transaksi);
+        transaksi.setLayout(transaksiLayout);
+        transaksiLayout.setHorizontalGroup(
+            transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 693, Short.MAX_VALUE)
+            .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(transaksiLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(leftPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(topPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1))
+                    .addContainerGap()))
         );
-        mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(leftPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(mainPanelLayout.createSequentialGroup()
-                        .addComponent(topPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)))
-                .addContainerGap())
+        transaksiLayout.setVerticalGroup(
+            transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 427, Short.MAX_VALUE)
+            .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(transaksiLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(leftPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(transaksiLayout.createSequentialGroup()
+                            .addComponent(topPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)))
+                    .addContainerGap()))
         );
+
+        mainPanel.add(transaksi, "card2");
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Tanggal", "Waktu", "ID Transaksi", "Jenis", "Harga"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable1);
+
+        javax.swing.GroupLayout riwayatTransaksiLayout = new javax.swing.GroupLayout(riwayatTransaksi);
+        riwayatTransaksi.setLayout(riwayatTransaksiLayout);
+        riwayatTransaksiLayout.setHorizontalGroup(
+            riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+        );
+        riwayatTransaksiLayout.setVerticalGroup(
+            riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, riwayatTransaksiLayout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(jScrollPane2))
+        );
+
+        mainPanel.add(riwayatTransaksi, "card2");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -198,26 +227,106 @@ public class FormTransaksi extends javax.swing.JFrame {
         page.setVisible(true);
     }//GEN-LAST:event_btnLogoutActionPerformed
 
-    private void btnToUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToUserActionPerformed
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
+    private void btnToTransaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToTransaksiActionPerformed
+//        mainPanel.removeAll();
+//        mainPanel.repaint();
+//        mainPanel.revalidate();
+//        
+//        mainPanel.add(dataMenu);
+//        mainPanel.repaint();
+//        mainPanel.revalidate();
+    }//GEN-LAST:event_btnToTransaksiActionPerformed
 
-        //        mainPanel.add(dataUser);
-        mainPanel.repaint();
-        mainPanel.revalidate();
+    private void btnToUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToUserActionPerformed
+//        mainPanel.removeAll();
+//        mainPanel.repaint();
+//        mainPanel.revalidate();
+//        
+//        mainPanel.add(dataUser);
+//        mainPanel.repaint();
+//        mainPanel.revalidate();
     }//GEN-LAST:event_btnToUserActionPerformed
 
-    private void btnToMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenuActionPerformed
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
+    public String generateTransactionId() {
+        String transactionId = "TRX001"; // Default format if no previous transactions exist
+        String query = "SELECT id_transaksi FROM transaksi ORDER BY id_transaksi DESC LIMIT 1"; // Get the last transaction ID
 
-        //        mainPanel.add(dataMenu);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_btnToMenuActionPerformed
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(query);
 
+            if (rs.next()) {
+                // Get the last transaction ID (e.g., TRX001)
+                String lastId = rs.getString("id_transaksi");
+
+                // Extract the numeric part after 'TRX'
+                String numericPart = lastId.substring(3); // Extract '001' from 'TRX001'
+
+                // Increment the numeric part
+                int incrementedValue = Integer.parseInt(numericPart) + 1;
+
+                // Format the new ID with leading zeros if necessary
+                transactionId = "TRX" + String.format("%03d", incrementedValue); // TRX002, TRX003, etc.
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log error or handle it as needed
+        }
+
+        return transactionId;
+    }
+
+    
+    public void submitTransaction(Map<Integer, OrderItem> orderItems, int totalPembayaran, int totalKembalian) {
+        PreparedStatement stmt;
+        String idTransaksi = generateTransactionId(); // Get the new transaction ID
+
+        try {
+            String transaksiQuery = "INSERT INTO transaksi (id_transaksi, id_user, id_pelanggan, jenis_pesanan, total_harga, total_pembayaran, kembalian, tanggal_transaksi, status_pesanan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            stmt = conn.prepareStatement(transaksiQuery, Statement.RETURN_GENERATED_KEYS);
+
+            stmt.setString(1, idTransaksi);
+            stmt.setNull(2, java.sql.Types.INTEGER);
+            stmt.setNull(3, java.sql.Types.INTEGER);
+            stmt.setString(4, "dine_in");
+            stmt.setDouble(5, calculateTotalHarga(orderItems));  // Sum of item prices
+            stmt.setDouble(6, totalPembayaran);
+            stmt.setDouble(7, totalKembalian);
+            stmt.setDate(8, new java.sql.Date(System.currentTimeMillis()));  // Current date
+            stmt.setString(9, "diproses");  // Assuming the initial status is 'diproses'
+
+            stmt.executeUpdate();
+
+            // Step 2: Insert into 'detail_transaksi' table
+            for (OrderItem item : orderItems.values()) {
+                String detailQuery = "INSERT INTO detail_transaksi (id_transaksi, id_menu, kuantitas, harga_jual, subtotal) VALUES (?, ?, ?, ?, ?)";
+                stmt = conn.prepareStatement(detailQuery);
+
+                stmt.setString(1, idTransaksi);
+                stmt.setInt(2, item.getId());  // Assuming item.getId() corresponds to the menu ID
+                stmt.setInt(3, item.getQuantity());
+                stmt.setDouble(4, item.getPrice());
+                stmt.setDouble(5, item.getPrice() * item.getQuantity());
+
+                stmt.executeUpdate();
+            }
+
+            // Show confirmation message
+            JOptionPane.showMessageDialog(null,
+                    "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: " + totalPembayaran +
+                            "\nKembalian: " + totalKembalian,
+                    "Konfirmasi", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private double calculateTotalHarga(Map<Integer, OrderItem> orderItems) {
+        double totalHarga = 0;
+        for (OrderItem item : orderItems.values()) {
+            totalHarga += item.getPrice() * item.getQuantity();
+        }
+        return totalHarga;
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -232,13 +341,35 @@ public class FormTransaksi extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnToMenu;
+    private javax.swing.JButton btnToTransaksi;
     private javax.swing.JButton btnToUser;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
     private Component.Transaction.LeftPanel leftPanel;
     private javax.swing.JPanel mainPanel;
     private Component.Transaction.MenuPanel menuList;
     private javax.swing.JPanel menuPanel;
+    private javax.swing.JPanel riwayatTransaksi;
     private Component.Transaction.TopPanel topPanel;
+    private javax.swing.JPanel transaksi;
     // End of variables declaration//GEN-END:variables
+
+    private void loadDataMenu() {
+        try {
+            String query = "SELECT * FROM menu";
+            Statement stmt = conn.createStatement();
+            ResultSet res = stmt.executeQuery(query);
+            
+            while (res.next()) {
+                int idMenu = res.getInt("id_menu");
+                String namaMenu = res.getString("nama_menu");
+                double harga = res.getDouble("harga");
+
+                dataMenu.add(new Menu(idMenu, namaMenu, harga));
+            }
+            
+            menuList.setDataMenu(dataMenu);
+        } catch (Exception e) {}
+    }
 }

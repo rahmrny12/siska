@@ -5,6 +5,7 @@
 package View;
 import Helper.PlaceholderHelper;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.sql.*;
@@ -17,6 +18,10 @@ import javax.swing.JOptionPane;
 public class FormLogin extends javax.swing.JFrame {
 
     private Connection conn;
+    
+//    private final Image eyeShow;
+//    private final Image eyeHide;
+//    private boolean hide;
     
     public FormLogin() {
         initComponents();
@@ -143,8 +148,8 @@ public class FormLogin extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
 
         pack();

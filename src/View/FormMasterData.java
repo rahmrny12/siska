@@ -4,7 +4,9 @@
  */
 package View;
 
+import Component.BahanPopup;
 import Helper.PlaceholderHelper;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.FocusEvent;
@@ -18,8 +20,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.JTable;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 
 /**
  *
@@ -52,6 +69,29 @@ public class FormMasterData extends javax.swing.JFrame {
         txtHargaMenu.setText("");
     }
     
+    private void clearInputBahan() {
+        txtIDBahan.setText("");
+        txtNamaBahan.setText("");
+        txtStokBahan.setText("");
+        txtSatuan.setText("");
+    }
+    
+    private void clearInputSupplier() {
+        txtIDSupplier.setText("");
+        txtNamaSupplier.setText("");
+        txtAlamat.setText("");
+        txtNoTelepon.setText("");
+    }
+    
+    private void clearInputUser() {
+        txtIDUser.setText("");
+        txtNama.setText("");
+        txtUsername.setText("");
+        txtEmail.setText("");
+        txtPassword.setText("");
+        txtRole.setSelectedIndex(0);
+    }
+    
     private void loadTableMenu() {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID Menu");
@@ -82,8 +122,8 @@ public class FormMasterData extends javax.swing.JFrame {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID Bahan");
         model.addColumn("Nama");
-        model.addColumn("Jenis");
-        model.addColumn("Harga");
+        model.addColumn("Stok Bahan");
+        model.addColumn("Satuan");
 
         //Menampilkan data kedalam tabel
         try {
@@ -95,10 +135,9 @@ public class FormMasterData extends javax.swing.JFrame {
                     res.getString(2),res.getString(3),res.getString(4)});
                 }
             tblBahan.setModel(model);
-        }catch (Exception e) {
-            
-            
-        }      
+        }catch (Exception e) {} finally {
+            clearInputBahan();
+        }    
     }
     
     private void loadTableSupplier() {
@@ -118,10 +157,9 @@ public class FormMasterData extends javax.swing.JFrame {
                     res.getString(2),res.getString(3),res.getString(4)});
                 }
             tblSupplier.setModel(model);
-        }catch (Exception e) {
-            
-            
-        }      
+        }catch (Exception e) {} finally {
+            clearInputSupplier();
+        }
     }
     
     private void loadTableUser() {
@@ -130,6 +168,7 @@ public class FormMasterData extends javax.swing.JFrame {
         model.addColumn("Nama");
         model.addColumn("Username");
         model.addColumn("Email");
+        model.addColumn("Password");
         model.addColumn("Role");
 
         //Menampilkan data kedalam tabel
@@ -143,12 +182,29 @@ public class FormMasterData extends javax.swing.JFrame {
                     res.getString(2),
                     res.getString(3),
                     res.getString(4),
+                    res.getString(5),
                     res.getString(6)
                 });
             }
+            
             tblUser.setModel(model);
+            
+            tblUser.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    if (value != null) {
+                        // Mengubah password menjadi bintang
+                        StringBuilder password = new StringBuilder();
+                        for (int i = 0; i < value.toString().length(); i++) {
+                            password.append("*");
+                        }
+                        value = password.toString();
+                    }
+                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                }
+            });
         } catch (Exception e) {} finally {
-            clearInputMenu();
+            clearInputUser();
         }
     }
 
@@ -182,13 +238,13 @@ public class FormMasterData extends javax.swing.JFrame {
         txtUsername = new javax.swing.JTextField();
         jLabel68 = new javax.swing.JLabel();
         jLabel70 = new javax.swing.JLabel();
-        txtPassword = new javax.swing.JTextField();
         txtRole = new javax.swing.JComboBox<>();
         jScrollPane5 = new javax.swing.JScrollPane();
         tblUser = new javax.swing.JTable();
         btnTambahUser = new javax.swing.JButton();
         btnEditUser = new javax.swing.JButton();
         btnHapusUser = new javax.swing.JButton();
+        txtPassword = new javax.swing.JPasswordField();
         dataMenu = new javax.swing.JPanel();
         jLabel43 = new javax.swing.JLabel();
         txtIDMenu = new javax.swing.JTextField();
@@ -197,7 +253,6 @@ public class FormMasterData extends javax.swing.JFrame {
         jLabel45 = new javax.swing.JLabel();
         txtHargaMenu = new javax.swing.JTextField();
         jLabel46 = new javax.swing.JLabel();
-        jLabel47 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblMenu = new javax.swing.JTable();
         jLabel48 = new javax.swing.JLabel();
@@ -205,6 +260,9 @@ public class FormMasterData extends javax.swing.JFrame {
         btnTambahMenu = new javax.swing.JButton();
         btnEditMenu = new javax.swing.JButton();
         btnHapusMenu = new javax.swing.JButton();
+        jLabel59 = new javax.swing.JLabel();
+        panelBahan = new javax.swing.JPanel();
+        btnAddBahan = new javax.swing.JLabel();
         dataSupplier = new javax.swing.JPanel();
         jLabel54 = new javax.swing.JLabel();
         jScrollPane6 = new javax.swing.JScrollPane();
@@ -217,7 +275,7 @@ public class FormMasterData extends javax.swing.JFrame {
         jLabel57 = new javax.swing.JLabel();
         jLabel58 = new javax.swing.JLabel();
         btnTambahSupplier = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
+        editSupplier = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
         txtAlamat = new javax.swing.JTextField();
         dataBahan = new javax.swing.JPanel();
@@ -232,8 +290,8 @@ public class FormMasterData extends javax.swing.JFrame {
         jLabel52 = new javax.swing.JLabel();
         jLabel53 = new javax.swing.JLabel();
         btnTambahBahan = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        editBahan = new javax.swing.JButton();
+        btnhHapusBahan = new javax.swing.JButton();
         txtStokBahan = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -404,14 +462,7 @@ public class FormMasterData extends javax.swing.JFrame {
         jLabel70.setForeground(new java.awt.Color(255, 255, 255));
         jLabel70.setText("Role");
 
-        txtPassword.setForeground(new java.awt.Color(51, 51, 51));
-        txtPassword.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPasswordActionPerformed(evt);
-            }
-        });
-
-        txtRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "kasir", "admin" }));
+        txtRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "kasir", "admin", "owner" }));
 
         tblUser.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -454,6 +505,8 @@ public class FormMasterData extends javax.swing.JFrame {
                 btnHapusUserActionPerformed(evt);
             }
         });
+
+        txtPassword.setText("jPasswordField1");
 
         javax.swing.GroupLayout dataUserLayout = new javax.swing.GroupLayout(dataUser);
         dataUser.setLayout(dataUserLayout);
@@ -501,7 +554,7 @@ public class FormMasterData extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataUserLayout.createSequentialGroup()
                         .addGap(17, 17, 17)
                         .addGroup(dataUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane5)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 629, Short.MAX_VALUE)
                             .addGroup(dataUserLayout.createSequentialGroup()
                                 .addGap(2, 2, 2)
                                 .addComponent(jLabel69, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)))))
@@ -590,10 +643,6 @@ public class FormMasterData extends javax.swing.JFrame {
         jLabel46.setForeground(new java.awt.Color(255, 255, 255));
         jLabel46.setText("Harga Menu");
 
-        jLabel47.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel47.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel47.setText("Bahan");
-
         tblMenu.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -644,6 +693,21 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
+        jLabel59.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel59.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel59.setText("Bahan");
+
+        panelBahan.setBackground(new java.awt.Color(144, 2, 2));
+        panelBahan.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        btnAddBahan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Media/Plus.png"))); // NOI18N
+        btnAddBahan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnAddBahanMouseClicked(evt);
+            }
+        });
+        panelBahan.add(btnAddBahan);
+
         javax.swing.GroupLayout dataMenuLayout = new javax.swing.GroupLayout(dataMenu);
         dataMenu.setLayout(dataMenuLayout);
         dataMenuLayout.setHorizontalGroup(
@@ -651,33 +715,38 @@ public class FormMasterData extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataMenuLayout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(dataMenuLayout.createSequentialGroup()
-                            .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(dataMenuLayout.createSequentialGroup()
-                                    .addGap(2, 2, 2)
-                                    .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel44, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtJenisMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtNamaMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtHargaMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtIDMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(dataMenuLayout.createSequentialGroup()
-                            .addComponent(btnTambahMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnEditMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnHapusMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)))
-                    .addComponent(jLabel47, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
-                .addGap(20, 20, 20))
+                    .addGroup(dataMenuLayout.createSequentialGroup()
+                        .addComponent(btnTambahMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEditMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnHapusMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(327, 327, 327))
+                    .addGroup(dataMenuLayout.createSequentialGroup()
+                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataMenuLayout.createSequentialGroup()
+                                .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(dataMenuLayout.createSequentialGroup()
+                                        .addGap(2, 2, 2)
+                                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel44, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                            .addGroup(dataMenuLayout.createSequentialGroup()
+                                .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(24, 24, 24)))
+                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(panelBahan, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                            .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(txtJenisMenu, javax.swing.GroupLayout.Alignment.LEADING, 0, 213, Short.MAX_VALUE)
+                                .addComponent(txtNamaMenu, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtIDMenu, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtHargaMenu)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                        .addContainerGap())))
             .addComponent(jLabel48, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -708,17 +777,19 @@ public class FormMasterData extends javax.swing.JFrame {
                                 .addComponent(txtJenisMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(txtHargaMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(dataMenuLayout.createSequentialGroup()
+                                .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 106, Short.MAX_VALUE))
+                            .addComponent(panelBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel47, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
                         .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                             .addComponent(btnTambahMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                             .addComponent(btnEditMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnHapusMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(dataMenuLayout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addGap(1, 1, 1)))
-                .addGap(31, 31, 31))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(32, 32, 32))
         );
 
         dataMenuLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnEditMenu, btnHapusMenu, btnTambahMenu});
@@ -740,7 +811,7 @@ public class FormMasterData extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "ID Menu", "Nama Menu", "Jenis", "Harga"
+                "ID Menu", "Nama Menu", "Alamat", "No Telepon"
             }
         ));
         tblSupplier.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -750,7 +821,6 @@ public class FormMasterData extends javax.swing.JFrame {
         });
         jScrollPane6.setViewportView(tblSupplier);
 
-        txtIDSupplier.setForeground(new java.awt.Color(153, 153, 153));
         txtIDSupplier.setEnabled(false);
         txtIDSupplier.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -758,14 +828,12 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
-        txtNamaSupplier.setForeground(new java.awt.Color(153, 153, 153));
         txtNamaSupplier.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNamaSupplierActionPerformed(evt);
             }
         });
 
-        txtNoTelepon.setForeground(new java.awt.Color(153, 153, 153));
         txtNoTelepon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNoTeleponActionPerformed(evt);
@@ -796,11 +864,11 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
-        jButton7.setText("EDIT");
-        jButton7.setPreferredSize(new java.awt.Dimension(65, 21));
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
+        editSupplier.setText("EDIT");
+        editSupplier.setPreferredSize(new java.awt.Dimension(65, 21));
+        editSupplier.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
+                editSupplierActionPerformed(evt);
             }
         });
 
@@ -812,7 +880,6 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
-        txtAlamat.setForeground(new java.awt.Color(153, 153, 153));
         txtAlamat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtAlamatActionPerformed(evt);
@@ -823,37 +890,40 @@ public class FormMasterData extends javax.swing.JFrame {
         dataSupplier.setLayout(dataSupplierLayout);
         dataSupplierLayout.setHorizontalGroup(
             dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(dataSupplierLayout.createSequentialGroup()
-                .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataSupplierLayout.createSequentialGroup()
+                .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(dataSupplierLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel54, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(dataSupplierLayout.createSequentialGroup()
+                        .addGap(27, 27, 27)
                         .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(dataSupplierLayout.createSequentialGroup()
-                                .addGap(27, 27, 27)
-                                .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel55, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel56, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel57, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel58, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(12, 12, 12)
+                                .addComponent(btnTambahSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(editSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(dataSupplierLayout.createSequentialGroup()
+                                .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(dataSupplierLayout.createSequentialGroup()
+                                        .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel55, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel57, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel56, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                                    .addGroup(dataSupplierLayout.createSequentialGroup()
+                                        .addComponent(jLabel58, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGap(24, 24, 24)))
                                 .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtAlamat, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(txtNamaSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(txtNoTelepon, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(txtIDSupplier, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGroup(dataSupplierLayout.createSequentialGroup()
-                                .addGap(49, 49, 49)
-                                .addComponent(btnTambahSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(12, 12, 12)
-                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(31, 31, 31)
-                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataSupplierLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel54, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(txtIDSupplier, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)))
+                .addGap(8, 8, 8))
         );
         dataSupplierLayout.setVerticalGroup(
             dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -880,11 +950,11 @@ public class FormMasterData extends javax.swing.JFrame {
                             .addComponent(txtNoTelepon, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(30, 30, 30)
                         .addGroup(dataSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
-                            .addComponent(btnTambahSupplier, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
-                            .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(38, Short.MAX_VALUE))
+                            .addComponent(btnTambahSupplier, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                            .addComponent(editSupplier, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                            .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE))
+                .addGap(38, 38, 38))
         );
 
         mainPanel.add(dataSupplier, "card4");
@@ -904,7 +974,7 @@ public class FormMasterData extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "ID Menu", "Nama Menu", "Jenis", "Harga"
+                "ID Menu", "Nama Menu", "Stok bahan", "Satuan"
             }
         ));
         tblBahan.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -914,7 +984,6 @@ public class FormMasterData extends javax.swing.JFrame {
         });
         jScrollPane4.setViewportView(tblBahan);
 
-        txtIDBahan.setForeground(new java.awt.Color(153, 153, 153));
         txtIDBahan.setEnabled(false);
         txtIDBahan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -922,14 +991,12 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
-        txtNamaBahan.setForeground(new java.awt.Color(153, 153, 153));
         txtNamaBahan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNamaBahanActionPerformed(evt);
             }
         });
 
-        txtSatuan.setForeground(new java.awt.Color(153, 153, 153));
         txtSatuan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtSatuanActionPerformed(evt);
@@ -960,23 +1027,22 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
-        jButton5.setText("EDIT");
-        jButton5.setPreferredSize(new java.awt.Dimension(65, 21));
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        editBahan.setText("EDIT");
+        editBahan.setPreferredSize(new java.awt.Dimension(65, 21));
+        editBahan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                editBahanActionPerformed(evt);
             }
         });
 
-        jButton6.setText("HAPUS");
-        jButton6.setPreferredSize(new java.awt.Dimension(65, 21));
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        btnhHapusBahan.setText("HAPUS");
+        btnhHapusBahan.setPreferredSize(new java.awt.Dimension(65, 21));
+        btnhHapusBahan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                btnhHapusBahanActionPerformed(evt);
             }
         });
 
-        txtStokBahan.setForeground(new java.awt.Color(153, 153, 153));
         txtStokBahan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtStokBahanActionPerformed(evt);
@@ -988,11 +1054,11 @@ public class FormMasterData extends javax.swing.JFrame {
         dataBahanLayout.setHorizontalGroup(
             dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dataBahanLayout.createSequentialGroup()
-                .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(dataBahanLayout.createSequentialGroup()
-                        .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(27, 27, 27)
+                        .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(dataBahanLayout.createSequentialGroup()
-                                .addGap(27, 27, 27)
                                 .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel50, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel51, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1006,24 +1072,24 @@ public class FormMasterData extends javax.swing.JFrame {
                                         .addComponent(txtSatuan, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(txtIDBahan, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addGroup(dataBahanLayout.createSequentialGroup()
-                                .addGap(49, 49, 49)
-                                .addComponent(btnTambahBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(12, 12, 12)
-                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnTambahBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(31, 31, 31)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataBahanLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(editBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnhHapusBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addGap(8, 8, 8))
+                    .addGroup(dataBahanLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel49, javax.swing.GroupLayout.DEFAULT_SIZE, 648, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         dataBahanLayout.setVerticalGroup(
             dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dataBahanLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30)
                 .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(dataBahanLayout.createSequentialGroup()
@@ -1045,10 +1111,10 @@ public class FormMasterData extends javax.swing.JFrame {
                         .addGap(30, 30, 30)
                         .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
                             .addComponent(btnTambahBahan, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
-                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(38, Short.MAX_VALUE))
+                            .addComponent(editBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnhHapusBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(16, 16, 16))
         );
 
         mainPanel.add(dataBahan, "card4");
@@ -1261,10 +1327,18 @@ public class FormMasterData extends javax.swing.JFrame {
         txtNamaMenu.setText((String) tblMenu.getValueAt(baris, 1));
         txtJenisMenu.setSelectedItem((String) tblMenu.getValueAt(baris, 2));
         txtHargaMenu.setText((String) tblMenu.getValueAt(baris, 3));
+        
+        loadBahanMenu();
     }//GEN-LAST:event_tblMenuMouseClicked
 
     private void tblBahanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBahanMouseClicked
-        // TODO add your handling code here:
+            int baris = tblBahan.rowAtPoint(evt.getPoint());
+        String IDBahan = tblBahan.getValueAt(baris, 0).toString();
+        txtIDBahan.setText(IDBahan);
+        
+        txtNamaBahan.setText((String) tblBahan.getValueAt(baris, 1));
+        txtStokBahan.setText((String) tblBahan.getValueAt(baris, 2));
+        txtSatuan.setText((String) tblBahan.getValueAt(baris, 3));
     }//GEN-LAST:event_tblBahanMouseClicked
 
     private void txtIDBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIDBahanActionPerformed
@@ -1280,11 +1354,21 @@ public class FormMasterData extends javax.swing.JFrame {
     }//GEN-LAST:event_txtSatuanActionPerformed
 
     private void btnTambahBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahBahanActionPerformed
-        String IDBahan = txtIDBahan.getText();
         String namaBahan = txtNamaBahan.getText();
         String stokBahan = txtStokBahan.getText();
         String satuan = txtSatuan.getText();
         
+        // Melakukan validasi input
+        if (namaBahan.isEmpty() || stokBahan == null || satuan.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        try{
+            Integer.valueOf(stokBahan);
+        }catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Kolom stok bahan harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
         PreparedStatement stmt;
         
@@ -1302,15 +1386,84 @@ public class FormMasterData extends javax.swing.JFrame {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    
     }//GEN-LAST:event_btnTambahBahanActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
+    private void editBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBahanActionPerformed
+     // Mengambil data input
+        String IDBahan = txtIDBahan.getText();
+        String namaBahan = txtNamaBahan.getText();
+        String stokBahan = (String) txtStokBahan.getText();
+        String satuan = txtSatuan.getText();
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+        // Melakukan validasi input
+        if (IDBahan.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pilih Bahan yang ingin diedit!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if (namaBahan.isEmpty() || stokBahan == null || satuan.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        try{
+            Integer.valueOf(stokBahan);
+        }catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Kolom Stok bahan harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        PreparedStatement stmt;
+        
+        try {
+            // SQL query to check credentials
+            String query = "UPDATE `bahan` SET `nama_bahan` = ?, `stok_bahan` = ?, `satuan` = ? WHERE `id_bahan` = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setString(1, namaBahan);
+            stmt.setString(2, stokBahan);
+            stmt.setString(3, satuan);
+            stmt.setInt(4, Integer.parseInt(IDBahan));
+            stmt.executeUpdate();
+        
+            loadTableBahan();
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }   
+    }//GEN-LAST:event_editBahanActionPerformed
+
+    private void btnhHapusBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnhHapusBahanActionPerformed
+        String IDBahan = txtIDBahan.getText();
+        
+        if (IDBahan.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pilih Bahan yang ingin dihapus!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Konfirmasi sebelum menghapus
+        int confirmation = JOptionPane.showConfirmDialog(
+            this, 
+            "Apakah Anda yakin ingin menghapus Bahan tersebut?", 
+            "Konfirmasi Hapus", 
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirmation == JOptionPane.NO_OPTION) {
+            return;
+        }
+        
+        PreparedStatement stmt;
+        
+        try {
+            String query = "DELETE FROM `Bahan` WHERE `id_bahan` = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, Integer.parseInt(IDBahan));
+            stmt.executeUpdate();
+            
+            loadTableBahan();
+        } catch (SQLException ex) {}
+    }//GEN-LAST:event_btnhHapusBahanActionPerformed
 
     private void txtStokBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtStokBahanActionPerformed
         // TODO add your handling code here:
@@ -1333,7 +1486,13 @@ public class FormMasterData extends javax.swing.JFrame {
     }//GEN-LAST:event_btnToUser2ActionPerformed
 
     private void tblSupplierMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSupplierMouseClicked
-        // TODO add your handling code here:
+            int baris = tblSupplier.rowAtPoint(evt.getPoint());
+        String IDSupplier = tblSupplier.getValueAt(baris, 0).toString();
+        txtIDSupplier.setText(IDSupplier);
+        
+        txtNamaSupplier.setText((String) tblSupplier.getValueAt(baris, 1));
+        txtAlamat.setText((String) tblSupplier.getValueAt(baris, 2));
+        txtNoTelepon.setText((String) tblSupplier.getValueAt(baris, 3));
     }//GEN-LAST:event_tblSupplierMouseClicked
 
     private void txtIDSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIDSupplierActionPerformed
@@ -1349,10 +1508,21 @@ public class FormMasterData extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNoTeleponActionPerformed
 
     private void btnTambahSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahSupplierActionPerformed
-        String IDSupplier = txtIDSupplier.getText();
         String namaSupplier = txtNamaSupplier.getText();
-        String Alamat = txtAlamat.getText();
-        String NoTelepon = txtNoTelepon.getText();
+        String alamat = txtAlamat.getText();
+        String noTelepon = txtNoTelepon.getText();
+        
+        // Melakukan validasi input        
+        if (namaSupplier.isEmpty() || alamat.isEmpty() || noTelepon.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        try{
+            Integer.valueOf(noTelepon);
+        }catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Kolom nomor telepon harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         
         PreparedStatement stmt;
         
@@ -1361,8 +1531,8 @@ public class FormMasterData extends javax.swing.JFrame {
             String query = "INSERT INTO `supplier`(`nama_supplier`, `alamat`, `no_telp`) VALUES (?,?,?)";
             stmt = conn.prepareStatement(query);
             stmt.setString(1, namaSupplier);
-            stmt.setString(2, Alamat);
-            stmt.setString(3, NoTelepon);
+            stmt.setString(2, alamat);
+            stmt.setString(3, noTelepon);
             stmt.execute();
             
             loadTableSupplier();
@@ -1372,12 +1542,80 @@ public class FormMasterData extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnTambahSupplierActionPerformed
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton7ActionPerformed
+    private void editSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editSupplierActionPerformed
+        // Mengambil data input
+        String IDSupplier = txtIDSupplier.getText();
+        String namaSupplier = txtNamaSupplier.getText();
+        String alamat =  txtAlamat.getText();
+        String noTelepon = txtNoTelepon.getText();
+
+        // Melakukan validasi input
+        if (IDSupplier.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pilih menu yang ingin diedit!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if (namaSupplier.isEmpty() || alamat == null || noTelepon.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        try{
+            Integer.valueOf(noTelepon);
+        }catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Kolom nomor telepon harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        PreparedStatement stmt;
+        
+        try {
+            // SQL query to check credentials
+            String query = "UPDATE `supplier` SET `nama_supplier` = ?, `alamat` = ?, `no_telp` = ? WHERE `id_supplier` = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setString(1, namaSupplier);
+            stmt.setString(2, alamat);
+            stmt.setString(3, noTelepon);
+            stmt.setInt(4, Integer.parseInt(IDSupplier));
+            stmt.executeUpdate();
+        
+            loadTableSupplier();
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }        
+    }//GEN-LAST:event_editSupplierActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        // TODO add your handling code here:
+        String IDSupplier = txtIDSupplier.getText();
+        
+        if (IDSupplier.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pilih menu yang ingin dihapus!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Konfirmasi sebelum menghapus
+        int confirmation = JOptionPane.showConfirmDialog(
+            this, 
+            "Apakah Anda yakin ingin menghapus menu tersebut?", 
+            "Konfirmasi Hapus", 
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirmation == JOptionPane.NO_OPTION) {
+            return;
+        }
+        
+        PreparedStatement stmt;
+        
+        try {
+            String query = "DELETE FROM `supplier` WHERE `id_supplier` = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, Integer.parseInt(IDSupplier));
+            stmt.executeUpdate();
+            
+            loadTableSupplier();
+        } catch (SQLException ex) {}
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void txtAlamatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAlamatActionPerformed
@@ -1505,12 +1743,9 @@ public class FormMasterData extends javax.swing.JFrame {
         txtNama.setText((String) tblUser.getValueAt(baris, 1));
         txtUsername.setText((String) tblUser.getValueAt(baris, 2));
         txtEmail.setText((String) tblUser.getValueAt(baris, 3));
-        txtRole.setSelectedItem((String) tblUser.getValueAt(baris, 4));
+        txtPassword.setText((String) tblUser.getValueAt(baris, 4));
+        txtRole.setSelectedItem((String) tblUser.getValueAt(baris, 5));
     }//GEN-LAST:event_tblUserMouseClicked
-
-    private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPasswordActionPerformed
 
     private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
         // TODO add your handling code here:
@@ -1527,7 +1762,126 @@ public class FormMasterData extends javax.swing.JFrame {
     private void txtIDUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIDUserActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtIDUserActionPerformed
+
+    private void btnAddBahanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAddBahanMouseClicked
+        showAddBahanPopup();
+    }//GEN-LAST:event_btnAddBahanMouseClicked
     
+    private void loadBahanMenu() {
+        int IDMenu = Integer.parseInt(txtIDMenu.getText());
+        
+        panelBahan.removeAll();
+
+        try {
+            String query = "SELECT b.nama_bahan FROM bahan_menu bm " +
+                           "JOIN bahan b ON bm.id_bahan = b.id_bahan " +
+                           "WHERE bm.id_menu = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, IDMenu); // Replace with the selected menu ID
+            ResultSet res = stmt.executeQuery();
+
+            // menampilkan icon plus
+            JLabel btnAddBahan = new JLabel();
+            btnAddBahan.setIcon(new ImageIcon(getClass().getResource("/Media/Plus.png")));
+            btnAddBahan.setHorizontalTextPosition(SwingConstants.CENTER);
+            btnAddBahan.setVerticalTextPosition(SwingConstants.BOTTOM);
+            btnAddBahan.setPreferredSize(new Dimension(32, 32));
+            btnAddBahan.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    showAddBahanPopup();
+                }
+            });
+            
+            ButtonGroup removeButtonGroup = new ButtonGroup();
+            
+            while (res.next()) {
+                String namaBahan = res.getString("nama_bahan");
+                
+                // Create a badge for each bahan
+                JLabel badge = new JLabel(namaBahan);
+                badge.setOpaque(true);
+                badge.setBackground(Color.WHITE);
+                badge.setForeground(Color.RED);
+                badge.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                badge.setFont(new Font("Arial", Font.PLAIN, 12));
+                badge.setHorizontalAlignment(SwingConstants.CENTER);
+                badge.setPreferredSize(new Dimension(80, 20));
+
+                // Create a remove button with an "X" symbol
+                JToggleButton btnRemove = new JToggleButton("X"); // Using JToggleButton for the "grouping"
+                btnRemove.setPreferredSize(new Dimension(25, 25)); // Set the size of the remove button
+                btnRemove.setFont(new Font("Arial", Font.BOLD, 12));
+                btnRemove.setForeground(Color.WHITE);
+                btnRemove.setBackground(Color.RED);
+                btnRemove.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                btnRemove.setFocusPainted(false);
+
+                // Add remove button to the ButtonGroup
+                removeButtonGroup.add(btnRemove);
+                
+                JPanel badgePanel = new JPanel();
+                badgePanel.setLayout(new BorderLayout());
+                badgePanel.add(badge, BorderLayout.CENTER); // Add badge to center
+                badgePanel.add(btnRemove, BorderLayout.EAST); // Add "X" button to the right side of the badge
+
+
+                // Add badge to the panel
+                panelBahan.add(badgePanel);
+            }
+            
+            panelBahan.add(btnAddBahan);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            panelBahan.revalidate(); // Refresh the panel to show the badges
+            panelBahan.repaint();
+        }
+    }
+    
+    private void showAddBahanPopup() {
+        // Open the BahanPopup form
+        BahanPopup addBahanPopup = new BahanPopup();
+        addBahanPopup.setVisible(true);
+
+        // Set the action listener for the popup
+        addBahanPopup.setAddBahanActionListener((String IDBahan, int jumlahBahan) -> {
+            String IDMenu = txtIDMenu.getText(); // Get IDMenu from the JTextField
+
+            if (IDMenu.isEmpty()) {
+                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Pilih menu yang ingin diubah.", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            PreparedStatement stmt = null;
+
+            try {
+                // SQL query to insert data into bahan_menu
+                String query = "INSERT INTO `bahan_menu`(`id_menu`, `id_bahan`, `jumlah_bahan`) VALUES (?, ?, ?)";
+                stmt = conn.prepareStatement(query);
+                stmt.setString(1, IDMenu);
+                stmt.setString(2, IDBahan);
+                stmt.setInt(3, jumlahBahan);
+                stmt.execute();
+
+                // Refresh the table to reflect the new data
+                loadBahanMenu();
+                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Data berhasil ditambahkan.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Gagal menambahkan data. " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                // Ensure the statement is closed
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+                
     /**
      * @param args the command line arguments
      */
@@ -1565,6 +1919,7 @@ public class FormMasterData extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bodyPanel;
+    private javax.swing.JLabel btnAddBahan;
     private javax.swing.JButton btnEditMenu;
     private javax.swing.JButton btnEditUser;
     private javax.swing.JButton btnHapusMenu;
@@ -1579,19 +1934,18 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JButton btnToSupplier;
     private javax.swing.JButton btnToUser;
     private javax.swing.JButton btnToUser2;
+    private javax.swing.JButton btnhHapusBahan;
     private javax.swing.JPanel dataBahan;
     private javax.swing.JPanel dataMenu;
     private javax.swing.JPanel dataSupplier;
     private javax.swing.JPanel dataUser;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
+    private javax.swing.JButton editBahan;
+    private javax.swing.JButton editSupplier;
     private javax.swing.JButton jButton8;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
     private javax.swing.JLabel jLabel45;
     private javax.swing.JLabel jLabel46;
-    private javax.swing.JLabel jLabel47;
     private javax.swing.JLabel jLabel48;
     private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel50;
@@ -1603,6 +1957,7 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel56;
     private javax.swing.JLabel jLabel57;
     private javax.swing.JLabel jLabel58;
+    private javax.swing.JLabel jLabel59;
     private javax.swing.JLabel jLabel64;
     private javax.swing.JLabel jLabel65;
     private javax.swing.JLabel jLabel66;
@@ -1616,6 +1971,7 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel menuPanel;
+    private javax.swing.JPanel panelBahan;
     private javax.swing.JTable tblBahan;
     private javax.swing.JTable tblMenu;
     private javax.swing.JTable tblSupplier;
@@ -1633,7 +1989,7 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JTextField txtNamaMenu;
     private javax.swing.JTextField txtNamaSupplier;
     private javax.swing.JTextField txtNoTelepon;
-    private javax.swing.JTextField txtPassword;
+    private javax.swing.JPasswordField txtPassword;
     private javax.swing.JComboBox<String> txtRole;
     private javax.swing.JTextField txtSatuan;
     private javax.swing.JTextField txtStokBahan;

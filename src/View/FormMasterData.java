@@ -5,23 +5,16 @@
 package View;
 
 import Component.BahanPopup;
-import Helper.PlaceholderHelper;
+import Helper.KartuStok;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.JTable;
@@ -29,14 +22,24 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -45,6 +48,7 @@ import javax.swing.SwingConstants;
 public class FormMasterData extends javax.swing.JFrame {
 
     private Connection conn;
+    private HashMap<String, Object[]> dataStokBahan = new HashMap<>();
     
     public FormMasterData() {
         initComponents();
@@ -59,6 +63,8 @@ public class FormMasterData extends javax.swing.JFrame {
         mainPanel.repaint();
         mainPanel.revalidate();
         
+        panelContainerBahan.setVisible(false);
+        
         loadTableMenu();
     }
     
@@ -72,7 +78,6 @@ public class FormMasterData extends javax.swing.JFrame {
     private void clearInputBahan() {
         txtIDBahan.setText("");
         txtNamaBahan.setText("");
-        txtStokBahan.setText("");
         txtSatuan.setText("");
     }
     
@@ -101,7 +106,7 @@ public class FormMasterData extends javax.swing.JFrame {
 
         //Menampilkan data kedalam tabel
         try {
-            String query = "SELECT * FROM menu";
+            String query = "SELECT * FROM menu ORDER BY jenis, nama_menu";
             Statement stmt = conn.createStatement();
             ResultSet res = stmt.executeQuery(query);
             while(res.next()){
@@ -113,7 +118,9 @@ public class FormMasterData extends javax.swing.JFrame {
                 });
             }
             tblMenu.setModel(model);
-        } catch (Exception e) {} finally {
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             clearInputMenu();
         }
     }
@@ -135,9 +142,39 @@ public class FormMasterData extends javax.swing.JFrame {
                     res.getString(2),res.getString(3),res.getString(4)});
                 }
             tblBahan.setModel(model);
-        }catch (Exception e) {} finally {
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             clearInputBahan();
         }    
+    }
+    
+    private void loadDataStokBahan() {
+        dataStokBahan.clear();
+        txtPilihBahan.removeAllItems();
+        
+        setupRemoveButtonColumn();
+        
+        try {
+            String query = "SELECT * FROM bahan";
+            Statement stm = conn.createStatement();
+            ResultSet res = stm.executeQuery(query);
+
+            while (res.next()) {
+                String idBahan = res.getString("id_bahan");
+                String namaBahan = res.getString("nama_bahan");
+                int stokSistem = res.getInt("stok_bahan");
+                String satuanSistem = res.getString("satuan");
+
+                // Menyimpan data ke HashMap
+                dataStokBahan.put(namaBahan, new Object[]{idBahan, stokSistem, satuanSistem});
+
+                // Menambahkan nama bahan ke combobox
+                txtPilihBahan.addItem(namaBahan);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     private void loadTableSupplier() {
@@ -157,7 +194,7 @@ public class FormMasterData extends javax.swing.JFrame {
                     res.getString(2),res.getString(3),res.getString(4)});
                 }
             tblSupplier.setModel(model);
-        }catch (Exception e) {} finally {
+        } catch (Exception e) {            e.printStackTrace();        } finally {
             clearInputSupplier();
         }
     }
@@ -203,7 +240,9 @@ public class FormMasterData extends javax.swing.JFrame {
                     return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 }
             });
-        } catch (Exception e) {} finally {
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             clearInputUser();
         }
     }
@@ -224,7 +263,8 @@ public class FormMasterData extends javax.swing.JFrame {
         btnLogout = new javax.swing.JButton();
         btnToBahan = new javax.swing.JButton();
         btnToSupplier = new javax.swing.JButton();
-        btnToUser2 = new javax.swing.JButton();
+        btnToStokOpname = new javax.swing.JButton();
+        btnToStokMasuk = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
         dataUser = new javax.swing.JPanel();
         txtIDUser = new javax.swing.JTextField();
@@ -260,6 +300,8 @@ public class FormMasterData extends javax.swing.JFrame {
         btnTambahMenu = new javax.swing.JButton();
         btnEditMenu = new javax.swing.JButton();
         btnHapusMenu = new javax.swing.JButton();
+        btnBatal = new javax.swing.JButton();
+        panelContainerBahan = new javax.swing.JPanel();
         jLabel59 = new javax.swing.JLabel();
         panelBahan = new javax.swing.JPanel();
         btnAddBahan = new javax.swing.JLabel();
@@ -287,12 +329,24 @@ public class FormMasterData extends javax.swing.JFrame {
         txtSatuan = new javax.swing.JTextField();
         jLabel50 = new javax.swing.JLabel();
         jLabel51 = new javax.swing.JLabel();
-        jLabel52 = new javax.swing.JLabel();
         jLabel53 = new javax.swing.JLabel();
         btnTambahBahan = new javax.swing.JButton();
         editBahan = new javax.swing.JButton();
         btnhHapusBahan = new javax.swing.JButton();
-        txtStokBahan = new javax.swing.JTextField();
+        dataStokOpname = new javax.swing.JPanel();
+        jLabel71 = new javax.swing.JLabel();
+        jLabel74 = new javax.swing.JLabel();
+        jLabel75 = new javax.swing.JLabel();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        tblStokOpname = new javax.swing.JTable();
+        btnAddStokOpname = new javax.swing.JButton();
+        txtPilihBahan = new javax.swing.JComboBox<>();
+        txtStokFisik = new javax.swing.JSpinner();
+        labelStokSistem = new javax.swing.JLabel();
+        jLabel76 = new javax.swing.JLabel();
+        txtTanggalStopOpname = new javax.swing.JTextField();
+        btnSubmit = new javax.swing.JButton();
+        labelSatuanSistem = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(700, 500));
@@ -355,14 +409,25 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
-        btnToUser2.setBackground(new java.awt.Color(198, 40, 40));
-        btnToUser2.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnToUser2.setForeground(new java.awt.Color(255, 255, 255));
-        btnToUser2.setText("Stok Masuk");
-        btnToUser2.setPreferredSize(new java.awt.Dimension(95, 21));
-        btnToUser2.addActionListener(new java.awt.event.ActionListener() {
+        btnToStokOpname.setBackground(new java.awt.Color(198, 40, 40));
+        btnToStokOpname.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnToStokOpname.setForeground(new java.awt.Color(255, 255, 255));
+        btnToStokOpname.setText("Stok Opname");
+        btnToStokOpname.setPreferredSize(new java.awt.Dimension(95, 21));
+        btnToStokOpname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToUser2ActionPerformed(evt);
+                btnToStokOpnameActionPerformed(evt);
+            }
+        });
+
+        btnToStokMasuk.setBackground(new java.awt.Color(198, 40, 40));
+        btnToStokMasuk.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnToStokMasuk.setForeground(new java.awt.Color(255, 255, 255));
+        btnToStokMasuk.setText("Stok Masuk");
+        btnToStokMasuk.setPreferredSize(new java.awt.Dimension(95, 21));
+        btnToStokMasuk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnToStokMasukActionPerformed(evt);
             }
         });
 
@@ -378,7 +443,9 @@ public class FormMasterData extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnToSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
-                .addComponent(btnToUser2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnToStokOpname, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(btnToStokMasuk, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnToUser, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -395,7 +462,8 @@ public class FormMasterData extends javax.swing.JFrame {
                     .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnToBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnToSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnToUser2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnToStokOpname, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnToStokMasuk, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -513,8 +581,8 @@ public class FormMasterData extends javax.swing.JFrame {
         dataUserLayout.setHorizontalGroup(
             dataUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dataUserLayout.createSequentialGroup()
-                .addGroup(dataUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataUserLayout.createSequentialGroup()
+                .addGroup(dataUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(dataUserLayout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addGroup(dataUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(dataUserLayout.createSequentialGroup()
@@ -551,14 +619,11 @@ public class FormMasterData extends javax.swing.JFrame {
                                 .addComponent(btnEditUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnHapusUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataUserLayout.createSequentialGroup()
+                    .addGroup(dataUserLayout.createSequentialGroup()
                         .addGap(17, 17, 17)
-                        .addGroup(dataUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 629, Short.MAX_VALUE)
-                            .addGroup(dataUserLayout.createSequentialGroup()
-                                .addGap(2, 2, 2)
-                                .addComponent(jLabel69, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 728, Short.MAX_VALUE)))
                 .addGap(20, 20, 20))
+            .addComponent(jLabel69, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         dataUserLayout.setVerticalGroup(
             dataUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -597,7 +662,7 @@ public class FormMasterData extends javax.swing.JFrame {
                     .addComponent(btnEditUser, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnHapusUser, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
                 .addGap(14, 14, 14))
         );
 
@@ -693,6 +758,16 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
+        btnBatal.setText("BATAL");
+        btnBatal.setPreferredSize(new java.awt.Dimension(65, 21));
+        btnBatal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBatalActionPerformed(evt);
+            }
+        });
+
+        panelContainerBahan.setBackground(new java.awt.Color(144, 2, 2));
+
         jLabel59.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel59.setForeground(new java.awt.Color(255, 255, 255));
         jLabel59.setText("Bahan");
@@ -708,6 +783,28 @@ public class FormMasterData extends javax.swing.JFrame {
         });
         panelBahan.add(btnAddBahan);
 
+        javax.swing.GroupLayout panelContainerBahanLayout = new javax.swing.GroupLayout(panelContainerBahan);
+        panelContainerBahan.setLayout(panelContainerBahanLayout);
+        panelContainerBahanLayout.setHorizontalGroup(
+            panelContainerBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelContainerBahanLayout.createSequentialGroup()
+                .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(panelBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(24, 24, 24))
+        );
+        panelContainerBahanLayout.setVerticalGroup(
+            panelContainerBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelContainerBahanLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelContainerBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panelContainerBahanLayout.createSequentialGroup()
+                        .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout dataMenuLayout = new javax.swing.GroupLayout(dataMenu);
         dataMenu.setLayout(dataMenuLayout);
         dataMenuLayout.setHorizontalGroup(
@@ -715,38 +812,33 @@ public class FormMasterData extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataMenuLayout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelContainerBahan, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(dataMenuLayout.createSequentialGroup()
+                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(dataMenuLayout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel44, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtJenisMenu, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtNamaMenu, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtIDMenu, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtHargaMenu, javax.swing.GroupLayout.Alignment.LEADING)))
                     .addGroup(dataMenuLayout.createSequentialGroup()
                         .addComponent(btnTambahMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEditMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnEditMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnHapusMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(327, 327, 327))
-                    .addGroup(dataMenuLayout.createSequentialGroup()
-                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataMenuLayout.createSequentialGroup()
-                                .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(dataMenuLayout.createSequentialGroup()
-                                        .addGap(2, 2, 2)
-                                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel44, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
-                            .addGroup(dataMenuLayout.createSequentialGroup()
-                                .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(24, 24, 24)))
-                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(panelBahan, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
-                            .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(txtJenisMenu, javax.swing.GroupLayout.Alignment.LEADING, 0, 213, Short.MAX_VALUE)
-                                .addComponent(txtNamaMenu, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtIDMenu, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtHargaMenu)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                        .addContainerGap())))
+                        .addComponent(btnHapusMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnBatal, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+                .addGap(24, 24, 24))
             .addComponent(jLabel48, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -778,16 +870,13 @@ public class FormMasterData extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(txtHargaMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(dataMenuLayout.createSequentialGroup()
-                                .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 106, Short.MAX_VALUE))
-                            .addComponent(panelBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelContainerBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(35, 35, 35)
                         .addGroup(dataMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                             .addComponent(btnTambahMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                             .addComponent(btnEditMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnHapusMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(btnHapusMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnBatal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addGap(32, 32, 32))
         );
@@ -921,8 +1010,8 @@ public class FormMasterData extends javax.swing.JFrame {
                                         .addComponent(txtNamaSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(txtNoTelepon, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(txtIDSupplier, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)))
                 .addGap(8, 8, 8))
         );
         dataSupplierLayout.setVerticalGroup(
@@ -953,7 +1042,7 @@ public class FormMasterData extends javax.swing.JFrame {
                             .addComponent(btnTambahSupplier, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                             .addComponent(editSupplier, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                             .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)))
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE))
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE))
                 .addGap(38, 38, 38))
         );
 
@@ -1011,10 +1100,6 @@ public class FormMasterData extends javax.swing.JFrame {
         jLabel51.setForeground(new java.awt.Color(255, 255, 255));
         jLabel51.setText("Nama Bahan");
 
-        jLabel52.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel52.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel52.setText("Stok Bahan");
-
         jLabel53.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel53.setForeground(new java.awt.Color(255, 255, 255));
         jLabel53.setText("Satuan");
@@ -1043,12 +1128,6 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         });
 
-        txtStokBahan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtStokBahanActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout dataBahanLayout = new javax.swing.GroupLayout(dataBahan);
         dataBahan.setLayout(dataBahanLayout);
         dataBahanLayout.setHorizontalGroup(
@@ -1062,15 +1141,12 @@ public class FormMasterData extends javax.swing.JFrame {
                                 .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel50, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel51, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel52, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel53, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(12, 12, 12)
-                                .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtStokBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(txtNamaBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(txtSatuan, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(txtIDBahan, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(txtNamaBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtSatuan, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtIDBahan, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(dataBahanLayout.createSequentialGroup()
                                 .addComponent(btnTambahBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1082,7 +1158,7 @@ public class FormMasterData extends javax.swing.JFrame {
                         .addGap(8, 8, 8))
                     .addGroup(dataBahanLayout.createSequentialGroup()
                         .addGap(12, 12, 12)
-                        .addComponent(jLabel49, javax.swing.GroupLayout.DEFAULT_SIZE, 648, Short.MAX_VALUE)))
+                        .addComponent(jLabel49, javax.swing.GroupLayout.DEFAULT_SIZE, 747, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         dataBahanLayout.setVerticalGroup(
@@ -1102,13 +1178,9 @@ public class FormMasterData extends javax.swing.JFrame {
                             .addComponent(txtNamaBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel52, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtStokBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel53, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtSatuan, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(30, 30, 30)
+                        .addGap(76, 76, 76)
                         .addGroup(dataBahanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
                             .addComponent(btnTambahBahan, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
                             .addComponent(editBahan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1119,11 +1191,148 @@ public class FormMasterData extends javax.swing.JFrame {
 
         mainPanel.add(dataBahan, "card4");
 
+        dataStokOpname.setBackground(new java.awt.Color(140, 2, 2));
+        dataStokOpname.setMinimumSize(new java.awt.Dimension(666, 360));
+
+        jLabel71.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel71.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel71.setText("Bahan:");
+
+        jLabel74.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel74.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel74.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel74.setText("Data Stok Opname");
+
+        jLabel75.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel75.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel75.setText("Stok Fisik:");
+
+        tblStokOpname.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID Bahan", "Nama Bahan", "Stok Sistem", "Stok Fisik", "Selisih", "Aksi"
+            }
+        ));
+        tblStokOpname.setRowHeight(40);
+        tblStokOpname.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblStokOpnameMouseClicked(evt);
+            }
+        });
+        jScrollPane7.setViewportView(tblStokOpname);
+
+        btnAddStokOpname.setText("TAMBAH");
+        btnAddStokOpname.setPreferredSize(new java.awt.Dimension(65, 21));
+        btnAddStokOpname.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddStokOpnameActionPerformed(evt);
+            }
+        });
+
+        txtPilihBahan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        txtPilihBahan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPilihBahanActionPerformed(evt);
+            }
+        });
+
+        labelStokSistem.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        labelStokSistem.setForeground(new java.awt.Color(255, 255, 255));
+        labelStokSistem.setText("Stok Sistem: -");
+
+        jLabel76.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel76.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel76.setText("Tanggal");
+
+        txtTanggalStopOpname.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtTanggalStopOpname.setEnabled(false);
+
+        btnSubmit.setText("SUBMIT");
+        btnSubmit.setPreferredSize(new java.awt.Dimension(65, 21));
+        btnSubmit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSubmitActionPerformed(evt);
+            }
+        });
+
+        labelSatuanSistem.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        labelSatuanSistem.setForeground(new java.awt.Color(255, 255, 255));
+        labelSatuanSistem.setText("Satuan: -");
+
+        javax.swing.GroupLayout dataStokOpnameLayout = new javax.swing.GroupLayout(dataStokOpname);
+        dataStokOpname.setLayout(dataStokOpnameLayout);
+        dataStokOpnameLayout.setHorizontalGroup(
+            dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel74, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataStokOpnameLayout.createSequentialGroup()
+                .addGroup(dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(dataStokOpnameLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(dataStokOpnameLayout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 721, Short.MAX_VALUE)
+                            .addComponent(jLabel71)
+                            .addGroup(dataStokOpnameLayout.createSequentialGroup()
+                                .addComponent(jLabel75)
+                                .addGap(18, 18, 18)
+                                .addGroup(dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btnAddStokOpname, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataStokOpnameLayout.createSequentialGroup()
+                                        .addGroup(dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtStokFisik)
+                                            .addComponent(txtPilihBahan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(labelStokSistem)
+                                            .addGroup(dataStokOpnameLayout.createSequentialGroup()
+                                                .addComponent(labelSatuanSistem)
+                                                .addGap(54, 54, 54)
+                                                .addComponent(jLabel76)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtTanggalStopOpname)))))))))
+                .addGap(24, 24, 24))
+        );
+        dataStokOpnameLayout.setVerticalGroup(
+            dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dataStokOpnameLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jLabel74, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel71, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtPilihBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(labelStokSistem, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(dataStokOpnameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel75, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtStokFisik, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel76, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtTanggalStopOpname, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelSatuanSistem, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAddStokOpname, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+
+        mainPanel.add(dataStokOpname, "card3");
+
         javax.swing.GroupLayout bodyPanelLayout = new javax.swing.GroupLayout(bodyPanel);
         bodyPanel.setLayout(bodyPanelLayout);
         bodyPanelLayout.setHorizontalGroup(
             bodyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(menuPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         bodyPanelLayout.setVerticalGroup(
@@ -1329,6 +1538,8 @@ public class FormMasterData extends javax.swing.JFrame {
         txtHargaMenu.setText((String) tblMenu.getValueAt(baris, 3));
         
         loadBahanMenu();
+        
+        panelContainerBahan.setVisible(true);
     }//GEN-LAST:event_tblMenuMouseClicked
 
     private void tblBahanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBahanMouseClicked
@@ -1337,7 +1548,6 @@ public class FormMasterData extends javax.swing.JFrame {
         txtIDBahan.setText(IDBahan);
         
         txtNamaBahan.setText((String) tblBahan.getValueAt(baris, 1));
-        txtStokBahan.setText((String) tblBahan.getValueAt(baris, 2));
         txtSatuan.setText((String) tblBahan.getValueAt(baris, 3));
     }//GEN-LAST:event_tblBahanMouseClicked
 
@@ -1355,30 +1565,22 @@ public class FormMasterData extends javax.swing.JFrame {
 
     private void btnTambahBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahBahanActionPerformed
         String namaBahan = txtNamaBahan.getText();
-        String stokBahan = txtStokBahan.getText();
         String satuan = txtSatuan.getText();
         
         // Melakukan validasi input
-        if (namaBahan.isEmpty() || stokBahan == null || satuan.isEmpty()) {
+        if (namaBahan.isEmpty() || satuan.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        try{
-            Integer.valueOf(stokBahan);
-        }catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Kolom stok bahan harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
         PreparedStatement stmt;
         
         try {
             // SQL query to check credentials
-            String query = "INSERT INTO `bahan`(`nama_bahan`, `stok_bahan`, `satuan`) VALUES (?,?,?)";
+            String query = "INSERT INTO `bahan`(`nama_bahan`, `satuan`) VALUES (?,?)";
             stmt = conn.prepareStatement(query);
             stmt.setString(1, namaBahan);
-            stmt.setString(2, stokBahan);
-            stmt.setString(3, satuan);
+            stmt.setString(2, satuan);
             stmt.execute();
             
             loadTableBahan();
@@ -1393,7 +1595,6 @@ public class FormMasterData extends javax.swing.JFrame {
      // Mengambil data input
         String IDBahan = txtIDBahan.getText();
         String namaBahan = txtNamaBahan.getText();
-        String stokBahan = (String) txtStokBahan.getText();
         String satuan = txtSatuan.getText();
 
         // Melakukan validasi input
@@ -1402,27 +1603,20 @@ public class FormMasterData extends javax.swing.JFrame {
             return;
         }
         
-        if (namaBahan.isEmpty() || stokBahan == null || satuan.isEmpty()) {
+        if (namaBahan.isEmpty() || satuan.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
-        }
-        
-        try{
-            Integer.valueOf(stokBahan);
-        }catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Kolom Stok bahan harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
         }
         
         PreparedStatement stmt;
         
         try {
             // SQL query to check credentials
-            String query = "UPDATE `bahan` SET `nama_bahan` = ?, `stok_bahan` = ?, `satuan` = ? WHERE `id_bahan` = ?";
+            String query = "UPDATE `bahan` SET `nama_bahan` = ?, `satuan` = ? WHERE `id_bahan` = ?";
             stmt = conn.prepareStatement(query);
             stmt.setString(1, namaBahan);
-            stmt.setString(2, stokBahan);
-            stmt.setString(3, satuan);
-            stmt.setInt(4, Integer.parseInt(IDBahan));
+            stmt.setString(2, satuan);
+            stmt.setInt(3, Integer.parseInt(IDBahan));
             stmt.executeUpdate();
         
             loadTableBahan();
@@ -1465,10 +1659,6 @@ public class FormMasterData extends javax.swing.JFrame {
         } catch (SQLException ex) {}
     }//GEN-LAST:event_btnhHapusBahanActionPerformed
 
-    private void txtStokBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtStokBahanActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtStokBahanActionPerformed
-
     private void btnToSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToSupplierActionPerformed
         mainPanel.removeAll();
         mainPanel.repaint();
@@ -1481,9 +1671,17 @@ public class FormMasterData extends javax.swing.JFrame {
         loadTableSupplier();
     }//GEN-LAST:event_btnToSupplierActionPerformed
 
-    private void btnToUser2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToUser2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnToUser2ActionPerformed
+    private void btnToStokOpnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToStokOpnameActionPerformed
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+
+        mainPanel.add(dataStokOpname);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        loadDataStokBahan();
+    }//GEN-LAST:event_btnToStokOpnameActionPerformed
 
     private void tblSupplierMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSupplierMouseClicked
             int baris = tblSupplier.rowAtPoint(evt.getPoint());
@@ -1763,17 +1961,254 @@ public class FormMasterData extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtIDUserActionPerformed
 
+    private void btnBatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatalActionPerformed
+        clearInputMenu();
+        panelContainerBahan.setVisible(false);
+    }//GEN-LAST:event_btnBatalActionPerformed
+
     private void btnAddBahanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAddBahanMouseClicked
         showAddBahanPopup();
     }//GEN-LAST:event_btnAddBahanMouseClicked
+
+    private void btnToStokMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToStokMasukActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnToStokMasukActionPerformed
+
+    private void tblStokOpnameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblStokOpnameMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblStokOpnameMouseClicked
+
+    private void setupRemoveButtonColumn() {
+        DefaultTableModel model = (DefaultTableModel) new DefaultTableModel();
+        model.addColumn("ID Bahan");
+        model.addColumn("Nama Bahan");
+        model.addColumn("Stok Sistem");
+        model.addColumn("Stok Fisik");
+        model.addColumn("Selisih");
+        model.addColumn("Aksi");
+        
+        tblStokOpname.setModel(model);
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = dateFormat.format(new Date());
+
+        // Set the date in the text field
+        txtTanggalStopOpname.setText(currentDate);
+        
+        TableColumn column = tblStokOpname.getColumnModel().getColumn(5);
+        column.setCellRenderer(new ButtonRenderer());
+        column.setCellEditor(new ButtonEditor(new JCheckBox()));
+    }
     
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+            setMargin(new Insets(5, 10, 5, 10));
+            setPreferredSize(new Dimension(100, 30));
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setText("Batal");
+            return this;
+        }
+    }
+    
+    class ButtonEditor extends DefaultCellEditor {
+        private JButton button;
+        private String label;
+        private boolean isPushed;
+
+        public ButtonEditor(JCheckBox checkBox) {
+            super(checkBox);
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    fireEditingStopped();
+                }
+            });
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            label = "Batal";
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                // Remove row
+                DefaultTableModel model = (DefaultTableModel) tblStokOpname.getModel();
+                int rowToRemove = tblStokOpname.getSelectedRow();
+                
+                if (rowToRemove != -1 && model.getRowCount() > 0) {
+                    model.removeRow(rowToRemove);
+                }
+            }
+            isPushed = false;
+            return label;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+
+        @Override
+        protected void fireEditingStopped() {
+            super.fireEditingStopped();
+        }
+    }
+    
+    private void btnAddStokOpnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddStokOpnameActionPerformed
+        DefaultTableModel model = (DefaultTableModel) tblStokOpname.getModel();
+        String namaBahan = (String) txtPilihBahan.getSelectedItem();
+        int stokFisik = (int) txtStokFisik.getValue();
+
+        // Mendapatkan data dari HashMap
+        Object[] data = dataStokBahan.get(namaBahan);
+        String idBahan = (String) data[0]; // ID bahan
+        int stokSistem = (int) data[1]; // Stok sistem
+        int selisih = stokFisik - stokSistem;
+
+        // Menambahkan data ke tabel
+        model.addRow(new Object[]{
+                idBahan,
+                namaBahan,
+                stokSistem,
+                stokFisik,
+                selisih
+        });
+
+        // Reset spinner
+        txtStokFisik.setValue(0);
+    }//GEN-LAST:event_btnAddStokOpnameActionPerformed
+
+    private void txtPilihBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPilihBahanActionPerformed
+        String selectedBahan = (String) txtPilihBahan.getSelectedItem();
+
+        if (selectedBahan != null && dataStokBahan.containsKey(selectedBahan)) {
+            // Ambil stok sistem dari HashMap
+            Object[] bahanData = dataStokBahan.get(selectedBahan);
+            int stokSistem = (int) bahanData[1];
+            String satuanSistem = (String) bahanData[2];
+            
+            labelStokSistem.setText("Stok Sistem: " + String.valueOf(stokSistem));
+            labelSatuanSistem.setText("Satuan Sistem: " + satuanSistem);
+        }
+    }//GEN-LAST:event_txtPilihBahanActionPerformed
+
+    private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
+        DefaultTableModel model = (DefaultTableModel) tblStokOpname.getModel();
+    
+        // Assuming 'id_user' is temporarily set to null
+        String idUser = null; // Temporarily null or set it as necessary
+        String tanggal = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()); // Today's date
+
+        // Start transaction
+        try {
+            conn.setAutoCommit(false); // Disable auto-commit to begin the transaction
+
+            // Step 1: Insert into the stok_opname table
+            String insertOpnameQuery = "INSERT INTO stok_opname (tanggal, id_user, waktu) VALUES (?, ?, ?)";
+            try (PreparedStatement stmtOpname = conn.prepareStatement(insertOpnameQuery, Statement.RETURN_GENERATED_KEYS)) {
+                stmtOpname.setString(1, tanggal);
+                stmtOpname.setString(2, idUser); // idUser is null for now
+                java.sql.Time currentTime = new java.sql.Time(System.currentTimeMillis());
+                stmtOpname.setTime(3, currentTime);
+
+                // Execute the query and get the generated id_opname
+                int rowsAffected = stmtOpname.executeUpdate();
+                if (rowsAffected > 0) {
+                    ResultSet rs = stmtOpname.getGeneratedKeys();
+                    if (rs.next()) {
+                        int idOpname = rs.getInt(1); // This is the id_opname we just inserted
+
+                        // Step 2: Insert each detail into stok_opname_detail
+                        String insertDetailQuery = "INSERT INTO stok_opname_detail (id_opname, id_bahan, stok_awal, stok_akhir, selisih) VALUES (?, ?, ?, ?, ?)";
+                        String updateBahanQuery = "UPDATE bahan SET stok_bahan = stok_bahan + ? WHERE id_bahan = ?";
+                        try (PreparedStatement stmtDetail = conn.prepareStatement(insertDetailQuery);
+                                PreparedStatement stmtUpdateBahan = conn.prepareStatement(updateBahanQuery)) {
+                            
+                            for (int row = 0; row < model.getRowCount(); row++) {
+                                int idBahan = Integer.parseInt(model.getValueAt(row, 0).toString()); // Assuming ID is in column 0
+                                int stokAwal = Integer.parseInt(model.getValueAt(row, 2).toString()); // Assuming Stok Sistem is in column 2
+                                int stokAkhir = Integer.parseInt(model.getValueAt(row, 3).toString()); // Assuming Stok Fisik is in column 3
+                                int selisih = stokAkhir - stokAwal; // Calculate selisih
+
+                                // Set values for the stok_opname_detail table
+                                stmtDetail.setInt(1, idOpname);   // Use the id_opname generated earlier
+                                stmtDetail.setInt(2, idBahan);
+                                stmtDetail.setInt(3, stokAwal);
+                                stmtDetail.setInt(4, stokAkhir);
+                                stmtDetail.setInt(5, selisih);
+
+                                // Execute the insert query for the detail record
+                                stmtDetail.executeUpdate();
+                                
+                                stmtUpdateBahan.setInt(1, selisih);  // Add or subtract the selisih value
+                                stmtUpdateBahan.setInt(2, idBahan);  // ID of the bahan being updated
+
+                                // Execute the update query for the bahan table
+                                stmtUpdateBahan.executeUpdate();
+                                
+                                // Kartu stok
+                                String keterangan = "Stok Opname (Selisih)";
+                                int jumlahMasuk = (selisih > 0) ? selisih : 0;
+                                int jumlahKeluar = (selisih < 0) ? Math.abs(selisih) : 0;
+
+                                KartuStok.insertKartuStok(conn, idBahan, keterangan, jumlahMasuk, jumlahKeluar, "stok_opname");
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            conn.rollback(); // Rollback if any detail insertion fails
+                            return;
+                        }
+                    }
+                } else {
+                    throw new SQLException("Failed to insert into stok_opname");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                conn.rollback(); // Rollback if any error occurs during opname insertion
+                return;
+            }
+
+            // Commit the transaction after successful inserts
+            conn.commit();
+
+            // Step 3: Clear all rows from the table after insertion
+            model.setRowCount(0); // Clears all rows from the table
+
+            // Optionally, show a message when done
+            JOptionPane.showMessageDialog(null, "Berhasil melakukan stok opname.");
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback(); // Rollback transaction in case of any error
+            } catch (SQLException ex) {}
+        } finally {
+            try {
+                conn.setAutoCommit(true); // Restore auto-commit mode
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_btnSubmitActionPerformed
+        
     private void loadBahanMenu() {
         int IDMenu = Integer.parseInt(txtIDMenu.getText());
         
         panelBahan.removeAll();
 
         try {
-            String query = "SELECT b.nama_bahan FROM bahan_menu bm " +
+            String query = "SELECT bm.id_bahan, b.nama_bahan FROM bahan_menu bm " +
                            "JOIN bahan b ON bm.id_bahan = b.id_bahan " +
                            "WHERE bm.id_menu = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
@@ -1797,6 +2232,7 @@ public class FormMasterData extends javax.swing.JFrame {
             
             while (res.next()) {
                 String namaBahan = res.getString("nama_bahan");
+                int IDBahan = res.getInt("id_bahan");
                 
                 // Create a badge for each bahan
                 JLabel badge = new JLabel(namaBahan);
@@ -1816,6 +2252,46 @@ public class FormMasterData extends javax.swing.JFrame {
                 btnRemove.setBackground(Color.RED);
                 btnRemove.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
                 btnRemove.setFocusPainted(false);
+                btnRemove.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        int confirmation = JOptionPane.showConfirmDialog(
+                            null, 
+                            "Apakah Anda yakin ingin menghapus bahan tersebut?", 
+                            "Konfirmasi Hapus", 
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE
+                        );
+
+                        if (confirmation == JOptionPane.YES_OPTION) {
+                            PreparedStatement stmt = null;
+
+                            try {
+                                int IDMenu = Integer.parseInt(txtIDMenu.getText());
+                                
+                                String query = "DELETE FROM `bahan_menu` WHERE `id_menu` = ? AND `id_bahan` = ?";
+                                stmt = conn.prepareStatement(query);
+                                stmt.setInt(1, IDMenu);
+                                stmt.setInt(2, IDBahan);
+                                stmt.executeUpdate();
+
+                                loadBahanMenu();
+                                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Data berhasil ditambahkan.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            } catch (SQLException ex) {
+                                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Gagal mengubah data. " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                            } finally {
+                                // Ensure the statement is closed
+                                if (stmt != null) {
+                                    try {
+                                        stmt.close();
+                                    } catch (SQLException ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
 
                 // Add remove button to the ButtonGroup
                 removeButtonGroup.add(btnRemove);
@@ -1920,23 +2396,28 @@ public class FormMasterData extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bodyPanel;
     private javax.swing.JLabel btnAddBahan;
+    private javax.swing.JButton btnAddStokOpname;
+    private javax.swing.JButton btnBatal;
     private javax.swing.JButton btnEditMenu;
     private javax.swing.JButton btnEditUser;
     private javax.swing.JButton btnHapusMenu;
     private javax.swing.JButton btnHapusUser;
     private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnSubmit;
     private javax.swing.JButton btnTambahBahan;
     private javax.swing.JButton btnTambahMenu;
     private javax.swing.JButton btnTambahSupplier;
     private javax.swing.JButton btnTambahUser;
     private javax.swing.JButton btnToBahan;
     private javax.swing.JButton btnToMenu;
+    private javax.swing.JButton btnToStokMasuk;
+    private javax.swing.JButton btnToStokOpname;
     private javax.swing.JButton btnToSupplier;
     private javax.swing.JButton btnToUser;
-    private javax.swing.JButton btnToUser2;
     private javax.swing.JButton btnhHapusBahan;
     private javax.swing.JPanel dataBahan;
     private javax.swing.JPanel dataMenu;
+    private javax.swing.JPanel dataStokOpname;
     private javax.swing.JPanel dataSupplier;
     private javax.swing.JPanel dataUser;
     private javax.swing.JButton editBahan;
@@ -1950,7 +2431,6 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel50;
     private javax.swing.JLabel jLabel51;
-    private javax.swing.JLabel jLabel52;
     private javax.swing.JLabel jLabel53;
     private javax.swing.JLabel jLabel54;
     private javax.swing.JLabel jLabel55;
@@ -1965,15 +2445,24 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel68;
     private javax.swing.JLabel jLabel69;
     private javax.swing.JLabel jLabel70;
+    private javax.swing.JLabel jLabel71;
+    private javax.swing.JLabel jLabel74;
+    private javax.swing.JLabel jLabel75;
+    private javax.swing.JLabel jLabel76;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JLabel labelSatuanSistem;
+    private javax.swing.JLabel labelStokSistem;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel menuPanel;
     private javax.swing.JPanel panelBahan;
+    private javax.swing.JPanel panelContainerBahan;
     private javax.swing.JTable tblBahan;
     private javax.swing.JTable tblMenu;
+    private javax.swing.JTable tblStokOpname;
     private javax.swing.JTable tblSupplier;
     private javax.swing.JTable tblUser;
     private javax.swing.JTextField txtAlamat;
@@ -1990,9 +2479,11 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JTextField txtNamaSupplier;
     private javax.swing.JTextField txtNoTelepon;
     private javax.swing.JPasswordField txtPassword;
+    private javax.swing.JComboBox<String> txtPilihBahan;
     private javax.swing.JComboBox<String> txtRole;
     private javax.swing.JTextField txtSatuan;
-    private javax.swing.JTextField txtStokBahan;
+    private javax.swing.JSpinner txtStokFisik;
+    private javax.swing.JTextField txtTanggalStopOpname;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

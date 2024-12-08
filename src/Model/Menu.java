@@ -12,11 +12,13 @@ public class Menu {
     private int id;
     private String namaMenu;
     private double harga;
+    private String jenis;
 
-    public Menu(int id, String namaMenu, double harga) {
+    public Menu(int id, String namaMenu, double harga, String jenis) {
         this.id = id;
         this.namaMenu = namaMenu;
         this.harga = harga;
+        this.jenis = jenis;
     }
 
     public int getId() {
@@ -30,13 +32,8 @@ public class Menu {
     public double getHarga() {
         return harga;
     }
-
-    @Override
-    public String toString() {
-        return "Menu{" +
-                "id=" + id +
-                ", name='" + namaMenu + '\'' +
-                ", price=" + harga +
-                '}';
+    
+    public String getJenis() {
+        return jenis;
     }
 }

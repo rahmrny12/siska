@@ -4,35 +4,45 @@
  */
 package Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author LENOVO
  */
 public class OrderItem {
-    private int id;
-    private String name;
-    private double price;
-    private int quantity;
-    private String topping;
-    private String level;
+    private final int id;
+    private final String nama;
+    private final double harga;
+    private final String jenis;
+    private int kuantitas;
+    private List<String> toppings; // Changed to List<String>
+    private List<String> levels;   // Changed to List<String>
 
-    public OrderItem(int id, String name, double price) {
+    public OrderItem(int id, String nama, double harga, String jenis) {
         this.id = id;
-        this.name = name;
-        this.price = price;
-        this.quantity = 1; // Default quantity
-        this.topping = "None"; // Default topping
-        this.level = "Mild"; // Default level
+        this.nama = nama;
+        this.harga = harga;
+        this.jenis = jenis;
+        this.kuantitas = 1;
+        this.toppings = new ArrayList<>(); // Initialize with empty list
+        this.levels = new ArrayList<>();   // Initialize with empty list
     }
 
     // Getters and setters
     public int getId() { return id; }
-    public String getName() { return name; }
-    public double getPrice() { return price; }
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
-    public String getTopping() { return topping; }
-    public void setTopping(String topping) { this.topping = topping; }
-    public String getLevel() { return level; }
-    public void setLevel(String level) { this.level = level; }
+    public String getNama() { return nama; }
+    public double getHarga() { return harga; }
+    public String getJenis() { return jenis; }
+    public int getKuantitas() { return kuantitas; }
+    public void setKuantitas(int kuantitas) { this.kuantitas = kuantitas; }
+
+    public List<String> getToppings() { return toppings; }
+    public void addTopping(String topping) { this.toppings.add(topping); }
+    public void removeTopping(String topping) { this.toppings.remove(topping); }
+
+    public List<String> getLevels() { return levels; }
+    public void addLevel(String level) { this.levels.add(level); }
+    public void removeLevel(String level) { this.levels.remove(level); }
 }

@@ -4,14 +4,20 @@
  */
 package View;
 
+import Helper.KartuStok;
 import Model.Menu;
 import Model.OrderItem;
+import java.awt.print.PrinterJob;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -45,7 +51,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                 }
             }
             
-            leftPanel.addOrderItem(selectedMenu.getId(), selectedMenu.getNamaMenu(), selectedMenu.getHarga());
+            leftPanel.addOrderItem(selectedMenu.getId(), selectedMenu.getNamaMenu(), selectedMenu.getHarga(), selectedMenu.getJenis());
         });
     }
 
@@ -60,7 +66,7 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         menuPanel = new javax.swing.JPanel();
         btnToTransaksi = new javax.swing.JButton();
-        btnToUser = new javax.swing.JButton();
+        btnToRiwayatTransaksi = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
         transaksi = new javax.swing.JPanel();
@@ -70,7 +76,8 @@ public class FormTransaksi extends javax.swing.JFrame {
         leftPanel = new Component.Transaction.LeftPanel();
         riwayatTransaksi = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblRiwayatTransaksi = new javax.swing.JTable();
+        jLabel69 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 51, 51));
@@ -88,13 +95,13 @@ public class FormTransaksi extends javax.swing.JFrame {
             }
         });
 
-        btnToUser.setBackground(new java.awt.Color(198, 40, 40));
-        btnToUser.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnToUser.setForeground(new java.awt.Color(255, 255, 255));
-        btnToUser.setText("Riwayat Transaksi");
-        btnToUser.addActionListener(new java.awt.event.ActionListener() {
+        btnToRiwayatTransaksi.setBackground(new java.awt.Color(198, 40, 40));
+        btnToRiwayatTransaksi.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnToRiwayatTransaksi.setForeground(new java.awt.Color(255, 255, 255));
+        btnToRiwayatTransaksi.setText("Riwayat Transaksi");
+        btnToRiwayatTransaksi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToUserActionPerformed(evt);
+                btnToRiwayatTransaksiActionPerformed(evt);
             }
         });
 
@@ -116,7 +123,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(btnToTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnToUser)
+                .addComponent(btnToRiwayatTransaksi)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnLogout)
                 .addContainerGap())
@@ -127,7 +134,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                 .addContainerGap(16, Short.MAX_VALUE)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnToTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnToUser, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnToRiwayatTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -169,7 +176,9 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         mainPanel.add(transaksi, "card2");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        riwayatTransaksi.setBackground(new java.awt.Color(140, 2, 2));
+
+        tblRiwayatTransaksi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -180,19 +189,32 @@ public class FormTransaksi extends javax.swing.JFrame {
                 "Tanggal", "Waktu", "ID Transaksi", "Jenis", "Harga"
             }
         ));
-        jScrollPane2.setViewportView(jTable1);
+        tblRiwayatTransaksi.setRowHeight(40);
+        jScrollPane2.setViewportView(tblRiwayatTransaksi);
+
+        jLabel69.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel69.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel69.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel69.setText("Riwayat Transaksi");
 
         javax.swing.GroupLayout riwayatTransaksiLayout = new javax.swing.GroupLayout(riwayatTransaksi);
         riwayatTransaksi.setLayout(riwayatTransaksiLayout);
         riwayatTransaksiLayout.setHorizontalGroup(
             riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+            .addComponent(jLabel69, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(riwayatTransaksiLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 645, Short.MAX_VALUE)
+                .addGap(24, 24, 24))
         );
         riwayatTransaksiLayout.setVerticalGroup(
             riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, riwayatTransaksiLayout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(jScrollPane2))
+                .addGap(20, 20, 20)
+                .addComponent(jLabel69)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(48, Short.MAX_VALUE))
         );
 
         mainPanel.add(riwayatTransaksi, "card2");
@@ -228,24 +250,26 @@ public class FormTransaksi extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void btnToTransaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToTransaksiActionPerformed
-//        mainPanel.removeAll();
-//        mainPanel.repaint();
-//        mainPanel.revalidate();
-//        
-//        mainPanel.add(dataMenu);
-//        mainPanel.repaint();
-//        mainPanel.revalidate();
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        mainPanel.add(transaksi);
+        mainPanel.repaint();
+        mainPanel.revalidate();
     }//GEN-LAST:event_btnToTransaksiActionPerformed
 
-    private void btnToUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToUserActionPerformed
-//        mainPanel.removeAll();
-//        mainPanel.repaint();
-//        mainPanel.revalidate();
-//        
-//        mainPanel.add(dataUser);
-//        mainPanel.repaint();
-//        mainPanel.revalidate();
-    }//GEN-LAST:event_btnToUserActionPerformed
+    private void btnToRiwayatTransaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToRiwayatTransaksiActionPerformed
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        mainPanel.add(riwayatTransaksi);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        loadTableRiwayatTransaksi();
+    }//GEN-LAST:event_btnToRiwayatTransaksiActionPerformed
 
     public String generateTransactionId() {
         String transactionId = "TRX001"; // Default format if no previous transactions exist
@@ -280,7 +304,10 @@ public class FormTransaksi extends javax.swing.JFrame {
         String idTransaksi = generateTransactionId(); // Get the new transaction ID
 
         try {
-            String transaksiQuery = "INSERT INTO transaksi (id_transaksi, id_user, id_pelanggan, jenis_pesanan, total_harga, total_pembayaran, kembalian, tanggal_transaksi, status_pesanan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            conn.setAutoCommit(false);
+            
+            String transaksiQuery = "INSERT INTO transaksi (id_transaksi, id_user, id_pelanggan, jenis_pesanan, total_harga, total_pembayaran, kembalian, tanggal_transaksi, waktu_transaksi, status_pesanan) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             stmt = conn.prepareStatement(transaksiQuery, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setString(1, idTransaksi);
@@ -291,30 +318,89 @@ public class FormTransaksi extends javax.swing.JFrame {
             stmt.setDouble(6, totalPembayaran);
             stmt.setDouble(7, totalKembalian);
             stmt.setDate(8, new java.sql.Date(System.currentTimeMillis()));  // Current date
-            stmt.setString(9, "diproses");  // Assuming the initial status is 'diproses'
+            stmt.setTime(9, new java.sql.Time(System.currentTimeMillis()));  // Current time
+            stmt.setString(10, "diproses");
 
             stmt.executeUpdate();
 
             // Step 2: Insert into 'detail_transaksi' table
             for (OrderItem item : orderItems.values()) {
-                String detailQuery = "INSERT INTO detail_transaksi (id_transaksi, id_menu, kuantitas, harga_jual, subtotal) VALUES (?, ?, ?, ?, ?)";
+                String detailQuery = "INSERT INTO detail_transaksi (id_transaksi, id_menu, kuantitas, harga_jual, subtotal, topping, level) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 stmt = conn.prepareStatement(detailQuery);
 
                 stmt.setString(1, idTransaksi);
                 stmt.setInt(2, item.getId());  // Assuming item.getId() corresponds to the menu ID
-                stmt.setInt(3, item.getQuantity());
-                stmt.setDouble(4, item.getPrice());
-                stmt.setDouble(5, item.getPrice() * item.getQuantity());
+                stmt.setInt(3, item.getKuantitas());
+                stmt.setDouble(4, item.getHarga());
+                stmt.setDouble(5, item.getHarga() * item.getKuantitas());
+                
+                String toppingString = String.join(",", item.getToppings());
+                stmt.setString(6, toppingString);
+                
+                String levelString = String.join(",", item.getLevels());
+                stmt.setString(7, levelString);
 
                 stmt.executeUpdate();
+                
+                String fetchBahanQuery = "SELECT bm.id_bahan, b.nama_bahan, bm.jumlah_bahan " +
+                         "FROM bahan_menu bm " +
+                         "INNER JOIN bahan b ON bm.id_bahan = b.id_bahan " +
+                         "WHERE bm.id_menu = ?";
+                PreparedStatement fetchStmt = conn.prepareStatement(fetchBahanQuery);
+                fetchStmt.setInt(1, item.getId());
+                ResultSet rs = fetchStmt.executeQuery();
+
+                while (rs.next()) {
+                    int idBahan = rs.getInt("id_bahan");
+                    String namaBahan = rs.getString("nama_bahan");
+                    int jumlahPerPorsi = rs.getInt("jumlah_bahan");
+
+                    // Calculate total quantity required
+                    int totalRequired = jumlahPerPorsi * item.getKuantitas();
+
+                    // Check stock
+                    String checkStockQuery = "SELECT stok_bahan FROM bahan WHERE id_bahan = ?";
+                    PreparedStatement checkStockStmt = conn.prepareStatement(checkStockQuery);
+                    checkStockStmt.setInt(1, idBahan);
+                    ResultSet stockRs = checkStockStmt.executeQuery();
+
+                    if (stockRs.next()) {
+                        int currentStock = stockRs.getInt("stok_bahan");
+
+                        if (currentStock < totalRequired) {
+                            throw new SQLException("Stok tidak mencukupi untuk bahan berikut: " + namaBahan);
+                        }
+
+                        // Update stock
+                        String updateStockQuery = "UPDATE bahan SET stok_bahan = stok_bahan - ? WHERE id_bahan = ?";
+                        PreparedStatement updateStockStmt = conn.prepareStatement(updateStockQuery);
+                        updateStockStmt.setInt(1, totalRequired);
+                        updateStockStmt.setInt(2, idBahan);
+                        updateStockStmt.executeUpdate();
+                        
+                        String keterangan = "Transaksi";
+                        int jumlahMasuk = 0;
+                        int jumlahKeluar = totalRequired;
+
+                        KartuStok.insertKartuStok(conn, idBahan, keterangan, jumlahMasuk, jumlahKeluar, "transaksi");
+                    } else {
+                        throw new SQLException("Bahan dengan ID: " + idBahan + " tidak ditemukan.");
+                    }
+                }
             }
+            
+            conn.commit();
 
             // Show confirmation message
             JOptionPane.showMessageDialog(null,
-                    "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: " + totalPembayaran +
-                            "\nKembalian: " + totalKembalian,
+                    "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: Rp. " + totalPembayaran +
+                            "\nKembalian: Rp. " + totalKembalian,
                     "Konfirmasi", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {}
+            
             JOptionPane.showMessageDialog(null, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -322,7 +408,7 @@ public class FormTransaksi extends javax.swing.JFrame {
     private double calculateTotalHarga(Map<Integer, OrderItem> orderItems) {
         double totalHarga = 0;
         for (OrderItem item : orderItems.values()) {
-            totalHarga += item.getPrice() * item.getQuantity();
+            totalHarga += item.getHarga() * item.getKuantitas();
         }
         return totalHarga;
     }
@@ -341,16 +427,17 @@ public class FormTransaksi extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnToRiwayatTransaksi;
     private javax.swing.JButton btnToTransaksi;
-    private javax.swing.JButton btnToUser;
+    private javax.swing.JLabel jLabel69;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
     private Component.Transaction.LeftPanel leftPanel;
     private javax.swing.JPanel mainPanel;
     private Component.Transaction.MenuPanel menuList;
     private javax.swing.JPanel menuPanel;
     private javax.swing.JPanel riwayatTransaksi;
+    private javax.swing.JTable tblRiwayatTransaksi;
     private Component.Transaction.TopPanel topPanel;
     private javax.swing.JPanel transaksi;
     // End of variables declaration//GEN-END:variables
@@ -365,11 +452,38 @@ public class FormTransaksi extends javax.swing.JFrame {
                 int idMenu = res.getInt("id_menu");
                 String namaMenu = res.getString("nama_menu");
                 double harga = res.getDouble("harga");
+                String jenis = res.getString("jenis");
 
-                dataMenu.add(new Menu(idMenu, namaMenu, harga));
+                dataMenu.add(new Menu(idMenu, namaMenu, harga, jenis));
             }
             
             menuList.setDataMenu(dataMenu);
         } catch (Exception e) {}
+    }
+
+    private void loadTableRiwayatTransaksi() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Tanggal");
+        model.addColumn("Waktu");
+        model.addColumn("ID Transaksi");
+        model.addColumn("Jenis");
+        model.addColumn("Total Transaksi");
+
+        //Menampilkan data kedalam tabel
+        try {
+            String query = "SELECT tanggal_transaksi, waktu_transaksi, id_transaksi, jenis_pesanan, total_harga FROM transaksi ORDER BY tanggal_transaksi DESC, waktu_transaksi DESC";
+            Statement stm=conn.createStatement();
+            ResultSet res=stm.executeQuery(query);
+            while(res.next()){
+                model.addRow(new Object[] {
+                    res.getString(1),
+                    res.getString(2),
+                    res.getString(3),
+                    res.getString(4).equals("dine_in") ? "Makan di tempat" : "Take Away",
+                    "Rp. " + String.valueOf((int) res.getFloat(5))
+                });
+            }
+            tblRiwayatTransaksi.setModel(model);
+        }catch (Exception e) {}
     }
 }

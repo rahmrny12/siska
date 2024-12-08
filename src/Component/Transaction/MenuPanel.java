@@ -27,17 +27,18 @@ public class MenuPanel extends JPanel {
         
         for (Menu menuItem : dataMenu) {
             int id = menuItem.getId();
-            String name = menuItem.getNamaMenu();
-            int price = (int) menuItem.getHarga();
+            String nama = menuItem.getNamaMenu();
+            int harga = (int) menuItem.getHarga();
+            String jenis = menuItem.getJenis();
 
-            add(createMenuCard(id, name, price));
+            add(createMenuCard(id, nama, harga, jenis));
         }
         
         add(new JLabel());
     }
     
     public MenuPanel() {
-        setLayout(new GridLayout(0, 2, 10, 10)); // 2 columns for menu items
+        setLayout(new GridLayout(0, 3, 10, 10)); // 2 columns for menu items
         
         conn = Helper.Database.OpenConnection();
 
@@ -70,18 +71,29 @@ public class MenuPanel extends JPanel {
         totalLabel.setHorizontalAlignment(SwingConstants.RIGHT);
     }
     
-    private JPanel createMenuCard(int id, String name, int price) {
+    private JPanel createMenuCard(int id, String nama, int harga, String jenis) {
         JPanel card = new JPanel();
-        card.setLayout(new BorderLayout());
+        card.setLayout(new GridLayout(0, 1, 10, 10)); // One column with gaps of 10px between items
         card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
-        JLabel nameLabel = new JLabel(name);
+        JPanel menuPanel = new JPanel();
+        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+        menuPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JLabel nameLabel = new JLabel(nama);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 20));
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel priceLabel = new JLabel("Rp. " + price);
+        JLabel priceLabel = new JLabel("Rp. " + harga);
+        priceLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        menuPanel.add(nameLabel);
+        menuPanel.add(priceLabel);
 
-        JButton addButton = new JButton("Add");
+        JButton addButton = new JButton("Tambah");
         addButton.addActionListener(e -> {
             if (actionListener != null) {
                 actionListener.onItemAdded(id);
@@ -89,8 +101,9 @@ public class MenuPanel extends JPanel {
         });
         
         // Add components to the card
-        card.add(nameLabel, BorderLayout.NORTH);
-        card.add(priceLabel, BorderLayout.CENTER);
+        card.add(new JLabel(""), BorderLayout.SOUTH);
+        card.add(menuPanel, BorderLayout.CENTER);
+        card.add(new JLabel(""), BorderLayout.SOUTH);
         card.add(addButton, BorderLayout.SOUTH);
 
         return card;

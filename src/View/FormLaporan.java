@@ -4,51 +4,102 @@
  */
 package View;
 
+import Component.BuatLaporan;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.swing.JOptionPane;
+import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author LENOVO
- */
 public class FormLaporan extends javax.swing.JFrame {
 
     private Connection conn;
+    
+    private HashMap<String, Object[]> dataStokBahan = new HashMap<>();
     
     public FormLaporan() {
         initComponents();
         
         conn = Helper.Database.OpenConnection();
-        load_table();
+        loadTableLaporanLaba();
+        loadTableLaporanKeluar();
+        loadTableRiwayatTransaksi();
+        
     }
-    
-    private void load_table() {
+    private void loadTableLaporanLaba() {
         DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID Menu");
-        model.addColumn("Nama");
-        model.addColumn("Jenis");
-        model.addColumn("Harga");
+        model.addColumn("ID Laporan Laba");
+        model.addColumn("Tanggal laporan");
+        model.addColumn("Total Pendapatan");
+        model.addColumn("Total pengeluaran");
+        model.addColumn("Laba Bersih");
 
         //Menampilkan data kedalam tabel
         try {
-            String query = "SELECT * FROM Menu";
+            String query = "SELECT * FROM laporan_laba";
+            PreparedStatement ps = conn.prepareStatement(query);       
+            Statement stm=conn.createStatement();
+            ResultSet res=stm.executeQuery(query);
+            while(res.next()){
+                model.addRow(new Object[] {res.getString(1),
+                    res.getString(2),res.getString(3),res.getString(4),res.getString(5)});
+                }
+            tblLaporanLaba.setModel(model);
+        }catch (Exception e) {
+        e.printStackTrace();                
+        }                           
+    }
+    
+    private void loadTableRiwayatTransaksi() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID Transaksi");
+        model.addColumn("Jenis pemesanan");
+        model.addColumn("Total Harga");
+        model.addColumn("Total Pembayaran");
+        model.addColumn("Kembalian");
+        model.addColumn("Tanggal Transaksi");
+        
+
+        //Menampilkan data kedalam tabel
+        try {
+            String query = "SELECT `id_transaksi`, `jenis_pesanan`, `total_harga`, `total_pembayaran`, `kembalian`,`tanggal_transaksi` FROM `transaksi`";
+            PreparedStatement ps = conn.prepareStatement(query);       
+            Statement stm=conn.createStatement();
+            ResultSet res=stm.executeQuery(query);
+            while(res.next()){
+                model.addRow(new Object[] {res.getString(1),
+                    res.getString(2),res.getString(3),res.getString(4),res.getString(5),res.getString(6)});
+                }
+            tblRiwayatTransaksi.setModel(model);
+        }catch (Exception e) {
+        e.printStackTrace();                
+        }                           
+    }
+    
+    private void loadTableLaporanKeluar() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID Laporan Pengeluaran");
+        model.addColumn("Tanggal Laporan");
+        model.addColumn("Deskripsi Pengeluaran");
+        model.addColumn("Total pengeluaran");
+        
+
+        //Menampilkan data kedalam tabel
+        try {
+            String query = "SELECT * FROM laporan_pengeluaran";
+            PreparedStatement ps = conn.prepareStatement(query);       
             Statement stm=conn.createStatement();
             ResultSet res=stm.executeQuery(query);
             while(res.next()){
                 model.addRow(new Object[] {res.getString(1),
                     res.getString(2),res.getString(3),res.getString(4)});
                 }
-            tblLaporan.setModel(model);
+            tblLaporanPengeluaran.setModel(model);
         }catch (Exception e) {
-                        
-        }
-                
-                
+        e.printStackTrace();                
+        }                           
     }
     
     /**
@@ -64,20 +115,21 @@ public class FormLaporan extends javax.swing.JFrame {
         menuPanel = new javax.swing.JPanel();
         btnToMenu = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
-        btnToMenu1 = new javax.swing.JButton();
-        btnToMenu2 = new javax.swing.JButton();
-        btnToMenu3 = new javax.swing.JButton();
-        btnToMenu4 = new javax.swing.JButton();
+        btnToRiwayatTransaksi = new javax.swing.JButton();
+        btnToKartuStok = new javax.swing.JButton();
+        btnToLaporanPengeluaran = new javax.swing.JButton();
+        btnToLaporanLaba = new javax.swing.JButton();
         btnToMenu5 = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
         riwayatTransaksi = new javax.swing.JPanel();
         jLabel45 = new javax.swing.JLabel();
         jLabel46 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        tblLaporan = new javax.swing.JTable();
+        tblRiwayatTransaksi = new javax.swing.JTable();
         jLabel49 = new javax.swing.JLabel();
         txtJenisMenu2 = new javax.swing.JComboBox<>();
         txtJenisMenu3 = new javax.swing.JComboBox<>();
+        btnBuatLaporan = new javax.swing.JButton();
         laporanStok = new javax.swing.JPanel();
         jLabel47 = new javax.swing.JLabel();
         jLabel50 = new javax.swing.JLabel();
@@ -90,7 +142,7 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel52 = new javax.swing.JLabel();
         jLabel53 = new javax.swing.JLabel();
         jScrollPane6 = new javax.swing.JScrollPane();
-        tblMenu3 = new javax.swing.JTable();
+        tblLaporanPengeluaran = new javax.swing.JTable();
         jLabel54 = new javax.swing.JLabel();
         txtJenisMenu6 = new javax.swing.JComboBox<>();
         txtJenisMenu7 = new javax.swing.JComboBox<>();
@@ -98,7 +150,7 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel43 = new javax.swing.JLabel();
         jLabel44 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tblMenu = new javax.swing.JTable();
+        tblLaporanLaba = new javax.swing.JTable();
         jLabel48 = new javax.swing.JLabel();
         txtJenisMenu = new javax.swing.JComboBox<>();
         txtJenisMenu1 = new javax.swing.JComboBox<>();
@@ -108,8 +160,20 @@ public class FormLaporan extends javax.swing.JFrame {
         jScrollPane7 = new javax.swing.JScrollPane();
         tblMenu4 = new javax.swing.JTable();
         jLabel57 = new javax.swing.JLabel();
+        cbBulan = new javax.swing.JComboBox<>();
+        cbTahun = new javax.swing.JComboBox<>();
+        kartuStok = new javax.swing.JPanel();
+        jLabel58 = new javax.swing.JLabel();
+        jLabel59 = new javax.swing.JLabel();
+        jLabel60 = new javax.swing.JLabel();
         txtJenisMenu8 = new javax.swing.JComboBox<>();
         txtJenisMenu9 = new javax.swing.JComboBox<>();
+        btnEkspor = new javax.swing.JButton();
+        jLabel61 = new javax.swing.JLabel();
+        txtPilihBahan = new javax.swing.JComboBox<>();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tblKartuStok = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -138,47 +202,47 @@ public class FormLaporan extends javax.swing.JFrame {
             }
         });
 
-        btnToMenu1.setBackground(new java.awt.Color(198, 40, 40));
-        btnToMenu1.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnToMenu1.setForeground(new java.awt.Color(255, 255, 255));
-        btnToMenu1.setText("Riwayat Transaksi");
-        btnToMenu1.setPreferredSize(new java.awt.Dimension(95, 21));
-        btnToMenu1.addActionListener(new java.awt.event.ActionListener() {
+        btnToRiwayatTransaksi.setBackground(new java.awt.Color(198, 40, 40));
+        btnToRiwayatTransaksi.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnToRiwayatTransaksi.setForeground(new java.awt.Color(255, 255, 255));
+        btnToRiwayatTransaksi.setText("Riwayat Transaksi");
+        btnToRiwayatTransaksi.setPreferredSize(new java.awt.Dimension(95, 21));
+        btnToRiwayatTransaksi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToMenu1ActionPerformed(evt);
+                btnToRiwayatTransaksiActionPerformed(evt);
             }
         });
 
-        btnToMenu2.setBackground(new java.awt.Color(198, 40, 40));
-        btnToMenu2.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnToMenu2.setForeground(new java.awt.Color(255, 255, 255));
-        btnToMenu2.setText("Laporan Stok");
-        btnToMenu2.setPreferredSize(new java.awt.Dimension(95, 21));
-        btnToMenu2.addActionListener(new java.awt.event.ActionListener() {
+        btnToKartuStok.setBackground(new java.awt.Color(198, 40, 40));
+        btnToKartuStok.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnToKartuStok.setForeground(new java.awt.Color(255, 255, 255));
+        btnToKartuStok.setText("Kartu Stok");
+        btnToKartuStok.setPreferredSize(new java.awt.Dimension(95, 21));
+        btnToKartuStok.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToMenu2ActionPerformed(evt);
+                btnToKartuStokActionPerformed(evt);
             }
         });
 
-        btnToMenu3.setBackground(new java.awt.Color(198, 40, 40));
-        btnToMenu3.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnToMenu3.setForeground(new java.awt.Color(255, 255, 255));
-        btnToMenu3.setText("Laporan Keluar");
-        btnToMenu3.setPreferredSize(new java.awt.Dimension(95, 21));
-        btnToMenu3.addActionListener(new java.awt.event.ActionListener() {
+        btnToLaporanPengeluaran.setBackground(new java.awt.Color(198, 40, 40));
+        btnToLaporanPengeluaran.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnToLaporanPengeluaran.setForeground(new java.awt.Color(255, 255, 255));
+        btnToLaporanPengeluaran.setText("Laporan Keluar");
+        btnToLaporanPengeluaran.setPreferredSize(new java.awt.Dimension(95, 21));
+        btnToLaporanPengeluaran.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToMenu3ActionPerformed(evt);
+                btnToLaporanPengeluaranActionPerformed(evt);
             }
         });
 
-        btnToMenu4.setBackground(new java.awt.Color(198, 40, 40));
-        btnToMenu4.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnToMenu4.setForeground(new java.awt.Color(255, 255, 255));
-        btnToMenu4.setText("Laporan Laba");
-        btnToMenu4.setPreferredSize(new java.awt.Dimension(136, 100));
-        btnToMenu4.addActionListener(new java.awt.event.ActionListener() {
+        btnToLaporanLaba.setBackground(new java.awt.Color(198, 40, 40));
+        btnToLaporanLaba.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnToLaporanLaba.setForeground(new java.awt.Color(255, 255, 255));
+        btnToLaporanLaba.setText("Laporan Laba");
+        btnToLaporanLaba.setPreferredSize(new java.awt.Dimension(136, 100));
+        btnToLaporanLaba.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToMenu4ActionPerformed(evt);
+                btnToLaporanLabaActionPerformed(evt);
             }
         });
 
@@ -201,13 +265,13 @@ public class FormLaporan extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(btnToMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnToMenu1, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnToRiwayatTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnToMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnToKartuStok, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnToMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnToLaporanPengeluaran, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnToMenu4, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnToLaporanLaba, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnToMenu5, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -221,10 +285,10 @@ public class FormLaporan extends javax.swing.JFrame {
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnToMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnToMenu1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnToMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnToMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnToMenu4, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnToRiwayatTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnToKartuStok, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnToLaporanPengeluaran, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnToLaporanLaba, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnToMenu5, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -242,24 +306,24 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel46.setForeground(new java.awt.Color(255, 255, 255));
         jLabel46.setText("Tahun");
 
-        tblLaporan.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        tblLaporan.setModel(new javax.swing.table.DefaultTableModel(
+        tblRiwayatTransaksi.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        tblRiwayatTransaksi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Tanggal", "Jenis", "ID Transaksi", "Harga"
+                "ID Transaksi", "Tanggal", "Jenis", "Harga", "Bayar", "Kembalian"
             }
         ));
-        tblLaporan.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblRiwayatTransaksi.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblLaporanMouseClicked(evt);
+                tblRiwayatTransaksiMouseClicked(evt);
             }
         });
-        jScrollPane4.setViewportView(tblLaporan);
+        jScrollPane4.setViewportView(tblRiwayatTransaksi);
 
         jLabel49.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel49.setForeground(new java.awt.Color(255, 255, 255));
@@ -284,6 +348,16 @@ public class FormLaporan extends javax.swing.JFrame {
             }
         });
 
+        btnBuatLaporan.setBackground(new java.awt.Color(204, 204, 204));
+        btnBuatLaporan.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnBuatLaporan.setForeground(new java.awt.Color(51, 51, 51));
+        btnBuatLaporan.setText("Buat Laporan");
+        btnBuatLaporan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuatLaporanActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout riwayatTransaksiLayout = new javax.swing.GroupLayout(riwayatTransaksi);
         riwayatTransaksi.setLayout(riwayatTransaksiLayout);
         riwayatTransaksiLayout.setHorizontalGroup(
@@ -291,20 +365,23 @@ public class FormLaporan extends javax.swing.JFrame {
             .addGroup(riwayatTransaksiLayout.createSequentialGroup()
                 .addGroup(riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(riwayatTransaksiLayout.createSequentialGroup()
-                        .addGap(113, 113, 113)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 768, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(riwayatTransaksiLayout.createSequentialGroup()
-                        .addGap(309, 309, 309)
-                        .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtJenisMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(34, 34, 34)
-                        .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtJenisMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(riwayatTransaksiLayout.createSequentialGroup()
                         .addGap(163, 163, 163)
-                        .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, riwayatTransaksiLayout.createSequentialGroup()
+                            .addGap(309, 309, 309)
+                            .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtJenisMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(34, 34, 34)
+                            .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtJenisMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnBuatLaporan))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, riwayatTransaksiLayout.createSequentialGroup()
+                            .addGap(113, 113, 113)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 768, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(113, Short.MAX_VALUE))
         );
         riwayatTransaksiLayout.setVerticalGroup(
@@ -317,10 +394,11 @@ public class FormLaporan extends javax.swing.JFrame {
                     .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtJenisMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtJenisMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtJenisMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBuatLaporan, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(67, Short.MAX_VALUE))
+                .addContainerGap(77, Short.MAX_VALUE))
         );
 
         mainPanel.add(riwayatTransaksi, "card2");
@@ -413,7 +491,7 @@ public class FormLaporan extends javax.swing.JFrame {
                     .addComponent(txtJenisMenu5, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(67, Short.MAX_VALUE))
+                .addContainerGap(79, Short.MAX_VALUE))
         );
 
         mainPanel.add(laporanStok, "card2");
@@ -428,8 +506,8 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel53.setForeground(new java.awt.Color(255, 255, 255));
         jLabel53.setText("Tahun");
 
-        tblMenu3.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        tblMenu3.setModel(new javax.swing.table.DefaultTableModel(
+        tblLaporanPengeluaran.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        tblLaporanPengeluaran.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -440,12 +518,12 @@ public class FormLaporan extends javax.swing.JFrame {
                 "ID", "Tanggal", "Deskripsi", "Total"
             }
         ));
-        tblMenu3.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblLaporanPengeluaran.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblMenu3MouseClicked(evt);
+                tblLaporanPengeluaranMouseClicked(evt);
             }
         });
-        jScrollPane6.setViewportView(tblMenu3);
+        jScrollPane6.setViewportView(tblLaporanPengeluaran);
 
         jLabel54.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel54.setForeground(new java.awt.Color(255, 255, 255));
@@ -506,7 +584,7 @@ public class FormLaporan extends javax.swing.JFrame {
                     .addComponent(txtJenisMenu7, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(67, Short.MAX_VALUE))
+                .addContainerGap(79, Short.MAX_VALUE))
         );
 
         mainPanel.add(laporanKeluar, "card2");
@@ -521,8 +599,8 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel44.setForeground(new java.awt.Color(255, 255, 255));
         jLabel44.setText("Tahun");
 
-        tblMenu.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        tblMenu.setModel(new javax.swing.table.DefaultTableModel(
+        tblLaporanLaba.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        tblLaporanLaba.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -530,15 +608,15 @@ public class FormLaporan extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Pengeluaran", "Pendapatan", "Laba bersih", "Tanggal"
+                "ID", "Tanggal", "Pendapatan", "Pengeluaran", "Laba bersih"
             }
         ));
-        tblMenu.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblLaporanLaba.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblMenuMouseClicked(evt);
+                tblLaporanLabaMouseClicked(evt);
             }
         });
-        jScrollPane3.setViewportView(tblMenu);
+        jScrollPane3.setViewportView(tblLaporanLaba);
 
         jLabel48.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel48.setForeground(new java.awt.Color(255, 255, 255));
@@ -599,7 +677,7 @@ public class FormLaporan extends javax.swing.JFrame {
                     .addComponent(txtJenisMenu1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(67, Short.MAX_VALUE))
+                .addContainerGap(79, Short.MAX_VALUE))
         );
 
         mainPanel.add(laporanLaba, "card2");
@@ -638,21 +716,21 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel57.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel57.setText("Laporan Stok Masuk");
 
-        txtJenisMenu8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        txtJenisMenu8.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
-        txtJenisMenu8.setPreferredSize(new java.awt.Dimension(64, 22));
-        txtJenisMenu8.addActionListener(new java.awt.event.ActionListener() {
+        cbBulan.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cbBulan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
+        cbBulan.setPreferredSize(new java.awt.Dimension(64, 22));
+        cbBulan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtJenisMenu8ActionPerformed(evt);
+                cbBulanActionPerformed(evt);
             }
         });
 
-        txtJenisMenu9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        txtJenisMenu9.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026" }));
-        txtJenisMenu9.setPreferredSize(new java.awt.Dimension(64, 22));
-        txtJenisMenu9.addActionListener(new java.awt.event.ActionListener() {
+        cbTahun.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cbTahun.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026" }));
+        cbTahun.setPreferredSize(new java.awt.Dimension(64, 22));
+        cbTahun.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtJenisMenu9ActionPerformed(evt);
+                cbTahunActionPerformed(evt);
             }
         });
 
@@ -672,11 +750,11 @@ public class FormLaporan extends javax.swing.JFrame {
                         .addGap(309, 309, 309)
                         .addComponent(jLabel55, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtJenisMenu8, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cbBulan, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(34, 34, 34)
                         .addComponent(jLabel56, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtJenisMenu9, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(cbTahun, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(113, Short.MAX_VALUE))
         );
         laporanStokMasukLayout.setVerticalGroup(
@@ -687,15 +765,144 @@ public class FormLaporan extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(laporanStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel55, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtJenisMenu8, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbBulan, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel56, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtJenisMenu9, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbTahun, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(67, Short.MAX_VALUE))
+                .addContainerGap(79, Short.MAX_VALUE))
         );
 
         mainPanel.add(laporanStokMasuk, "card2");
+
+        kartuStok.setBackground(new java.awt.Color(144, 2, 2));
+
+        jLabel58.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jLabel58.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel58.setText("Bulan");
+
+        jLabel59.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jLabel59.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel59.setText("Tahun");
+
+        jLabel60.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        jLabel60.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel60.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel60.setText("Kartu Stok");
+
+        txtJenisMenu8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtJenisMenu8.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
+        txtJenisMenu8.setPreferredSize(new java.awt.Dimension(64, 22));
+        txtJenisMenu8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtJenisMenu8ActionPerformed(evt);
+            }
+        });
+
+        txtJenisMenu9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtJenisMenu9.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026" }));
+        txtJenisMenu9.setPreferredSize(new java.awt.Dimension(64, 22));
+        txtJenisMenu9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtJenisMenu9ActionPerformed(evt);
+            }
+        });
+
+        btnEkspor.setBackground(new java.awt.Color(204, 204, 204));
+        btnEkspor.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnEkspor.setForeground(new java.awt.Color(51, 51, 51));
+        btnEkspor.setText("Cetak");
+        btnEkspor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEksporActionPerformed(evt);
+            }
+        });
+
+        jLabel61.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jLabel61.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel61.setText("Bahan");
+
+        txtPilihBahan.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtPilihBahan.setPreferredSize(new java.awt.Dimension(64, 22));
+        txtPilihBahan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPilihBahanActionPerformed(evt);
+            }
+        });
+
+        jPanel1.setLayout(new java.awt.CardLayout());
+
+        tblKartuStok.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        tblKartuStok.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID Transaksi", "Tanggal", "Jenis", "Harga", "Bayar", "Kembalian"
+            }
+        ));
+        tblKartuStok.setRowHeight(40);
+        tblKartuStok.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblKartuStokMouseClicked(evt);
+            }
+        });
+        jScrollPane8.setViewportView(tblKartuStok);
+
+        jPanel1.add(jScrollPane8, "card2");
+
+        javax.swing.GroupLayout kartuStokLayout = new javax.swing.GroupLayout(kartuStok);
+        kartuStok.setLayout(kartuStokLayout);
+        kartuStokLayout.setHorizontalGroup(
+            kartuStokLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(kartuStokLayout.createSequentialGroup()
+                .addGap(163, 163, 163)
+                .addComponent(jLabel60, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kartuStokLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addGroup(kartuStokLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(kartuStokLayout.createSequentialGroup()
+                        .addComponent(jLabel61, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtPilihBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(28, 28, 28)
+                        .addComponent(jLabel58, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtJenisMenu8, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34)
+                        .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtJenisMenu9, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEkspor)))
+                .addGap(19, 19, 19))
+        );
+        kartuStokLayout.setVerticalGroup(
+            kartuStokLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(kartuStokLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel60, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(kartuStokLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(kartuStokLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel61, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtPilihBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(kartuStokLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel58, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtJenisMenu8, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtJenisMenu9, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnEkspor, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 407, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(26, Short.MAX_VALUE))
+        );
+
+        mainPanel.add(kartuStok, "card2");
 
         javax.swing.GroupLayout bodyPanelLayout = new javax.swing.GroupLayout(bodyPanel);
         bodyPanel.setLayout(bodyPanelLayout);
@@ -728,13 +935,7 @@ public class FormLaporan extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnToMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenuActionPerformed
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(laporanLaba);
-        mainPanel.repaint();
-        mainPanel.revalidate();
+        
     }//GEN-LAST:event_btnToMenuActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
@@ -745,15 +946,14 @@ public class FormLaporan extends javax.swing.JFrame {
         page.setVisible(true);
     }//GEN-LAST:event_btnLogoutActionPerformed
 
-    private void tblMenuMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMenuMouseClicked
-        int baris = tblMenu.rowAtPoint(evt.getPoint());
-        String idMenu = tblMenu.getValueAt(baris, 1).toString();
-//        txtIDMenu.setText(idMenu);
-//        
-//        txtNamaMenu.setText((String) tblMenu.getValueAt(baris, 2));
-//        txtHargaMenu.setText((String) tblMenu.getValueAt(baris, 3));
-        txtJenisMenu.setSelectedItem((String) tblMenu.getValueAt(baris, 4));
-    }//GEN-LAST:event_tblMenuMouseClicked
+    private void tblLaporanLabaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblLaporanLabaMouseClicked
+        int baris = tblLaporanLaba.rowAtPoint(evt.getPoint());
+        String id = tblLaporanLaba.getValueAt(baris, 0).toString();
+        String tanggal = tblLaporanLaba.getValueAt(baris, 1).toString();
+        String pendapatan = tblLaporanLaba.getValueAt(baris, 2).toString();
+        String pengeluran = tblLaporanLaba.getValueAt(baris, 3).toString();
+        String labaBersih = tblLaporanLaba.getValueAt(baris, 4).toString();
+    }//GEN-LAST:event_tblLaporanLabaMouseClicked
 
     private void txtJenisMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtJenisMenuActionPerformed
         // TODO add your handling code here:
@@ -763,29 +963,71 @@ public class FormLaporan extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtJenisMenu1ActionPerformed
 
-    private void btnToMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenu1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnToMenu1ActionPerformed
+    private void btnToRiwayatTransaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToRiwayatTransaksiActionPerformed
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
 
-    private void btnToMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenu2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnToMenu2ActionPerformed
+        mainPanel.add(riwayatTransaksi);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        loadTableRiwayatTransaksi();
+    }//GEN-LAST:event_btnToRiwayatTransaksiActionPerformed
 
-    private void btnToMenu3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenu3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnToMenu3ActionPerformed
+    private void btnToKartuStokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToKartuStokActionPerformed
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
 
-    private void btnToMenu4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenu4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnToMenu4ActionPerformed
+        mainPanel.add(kartuStok);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        txtPilihBahan.revalidate();
+        txtPilihBahan.repaint();
+        
+        loadDataStokBahan();
+        loadKartuStok();
+    }//GEN-LAST:event_btnToKartuStokActionPerformed
+
+    private void btnToLaporanPengeluaranActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToLaporanPengeluaranActionPerformed
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+
+        mainPanel.add(laporanKeluar);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        loadTableLaporanKeluar();
+    }//GEN-LAST:event_btnToLaporanPengeluaranActionPerformed
+
+    private void btnToLaporanLabaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToLaporanLabaActionPerformed
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+
+        mainPanel.add(laporanLaba);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        loadTableLaporanLaba();
+    }//GEN-LAST:event_btnToLaporanLabaActionPerformed
 
     private void btnToMenu5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenu5ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnToMenu5ActionPerformed
 
-    private void tblLaporanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblLaporanMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tblLaporanMouseClicked
+    private void tblRiwayatTransaksiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblRiwayatTransaksiMouseClicked
+        int baris = tblRiwayatTransaksi.rowAtPoint(evt.getPoint());
+        String id = tblRiwayatTransaksi.getValueAt(baris, 0).toString();
+        String jenis = tblRiwayatTransaksi.getValueAt(baris, 1).toString();
+        String harga = tblRiwayatTransaksi.getValueAt(baris, 2).toString();
+        String bayar = tblRiwayatTransaksi.getValueAt(baris, 3).toString();
+        String kembalian = tblRiwayatTransaksi.getValueAt(baris, 4).toString();
+        String tanggal = tblRiwayatTransaksi.getValueAt(baris, 5).toString();
+    }//GEN-LAST:event_tblRiwayatTransaksiMouseClicked
 
     private void txtJenisMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtJenisMenu2ActionPerformed
         // TODO add your handling code here:
@@ -807,9 +1049,13 @@ public class FormLaporan extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtJenisMenu5ActionPerformed
 
-    private void tblMenu3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMenu3MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tblMenu3MouseClicked
+    private void tblLaporanPengeluaranMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblLaporanPengeluaranMouseClicked
+        int baris = tblLaporanLaba.rowAtPoint(evt.getPoint());
+        String idlaporanPengeluaran = tblLaporanPengeluaran.getValueAt(baris, 0).toString();
+        String tanggalLaporan = tblLaporanPengeluaran.getValueAt(baris, 1).toString();
+        String deskripsiPengeluaran = tblLaporanPengeluaran.getValueAt(baris, 2).toString();
+        String totalpengeluran = tblLaporanPengeluaran.getValueAt(baris, 3).toString();
+    }//GEN-LAST:event_tblLaporanPengeluaranMouseClicked
 
     private void txtJenisMenu6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtJenisMenu6ActionPerformed
         // TODO add your handling code here:
@@ -823,6 +1069,23 @@ public class FormLaporan extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_tblMenu4MouseClicked
 
+    private void cbBulanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBulanActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbBulanActionPerformed
+
+    private void cbTahunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTahunActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbTahunActionPerformed
+
+    private void btnBuatLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuatLaporanActionPerformed
+        BuatLaporan BuatLaporan = new BuatLaporan();
+        BuatLaporan.setVisible(true);
+    }//GEN-LAST:event_btnBuatLaporanActionPerformed
+
+    private void tblKartuStokMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblKartuStokMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblKartuStokMouseClicked
+
     private void txtJenisMenu8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtJenisMenu8ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtJenisMenu8ActionPerformed
@@ -831,9 +1094,92 @@ public class FormLaporan extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtJenisMenu9ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    private void btnEksporActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEksporActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEksporActionPerformed
+
+    private void txtPilihBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPilihBahanActionPerformed
+        loadKartuStok();
+    }//GEN-LAST:event_txtPilihBahanActionPerformed
+
+    private void loadDataStokBahan() {
+        dataStokBahan.clear();
+        txtPilihBahan.removeAllItems();
+               
+        try {
+            String query = "SELECT * FROM bahan";
+            Statement stm = conn.createStatement();
+            ResultSet res = stm.executeQuery(query);
+
+            while (res.next()) {
+                int idBahan = res.getInt("id_bahan");
+                String namaBahan = res.getString("nama_bahan");
+                int stokSistem = res.getInt("stok_bahan");
+                String satuanSistem = res.getString("satuan");
+
+                // Menyimpan data ke HashMap
+                dataStokBahan.put(namaBahan, new Object[]{idBahan, stokSistem, satuanSistem});
+
+                // Menambahkan nama bahan ke combobox
+                txtPilihBahan.addItem(namaBahan);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void loadKartuStok() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Tanggal");
+        model.addColumn("Keterangan");
+        model.addColumn("Jumlah Masuk");
+        model.addColumn("Jumlah Keluar");
+        model.addColumn("Saldo");
+        
+        String namaBahan = (String) txtPilihBahan.getSelectedItem();
+        Object[] data = dataStokBahan.get(namaBahan);
+        int idBahan = (int) data[0]; // ID bahan
+        
+        try {
+            //Menampilkan data kedalam tabel
+            String query = "SELECT tanggal, keterangan, jumlah_masuk, jumlah_keluar, saldo FROM kartu_stok WHERE id_bahan = ? ORDER BY tanggal, waktu ASC";
+            
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, idBahan);
+            
+            ResultSet res = ps.executeQuery();
+            
+            boolean hasData = false;
+            while(res.next()){
+                hasData = true;
+                
+                Object[] row = {
+                    res.getDate("tanggal"),
+                    res.getString("keterangan"),
+                    res.getInt("jumlah_masuk"),
+                    res.getInt("jumlah_keluar"),
+                    res.getInt("saldo")
+                };
+                model.addRow(row);
+                tblKartuStok.setModel(model);
+            }
+            
+            if (!hasData) {
+                Object[] emptyRow = {"-", "No data available", 0, 0, 0};
+                model.addRow(emptyRow);
+                tblKartuStok.setVisible(false);
+            } else {
+                tblKartuStok.setVisible(true);
+            }
+            
+            /**
+             * @param args the command line arguments
+             */
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -872,6 +1218,22 @@ public class FormLaporan extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -883,13 +1245,17 @@ public class FormLaporan extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bodyPanel;
+    private javax.swing.JButton btnBuatLaporan;
+    private javax.swing.JButton btnEkspor;
     private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnToKartuStok;
+    private javax.swing.JButton btnToLaporanLaba;
+    private javax.swing.JButton btnToLaporanPengeluaran;
     private javax.swing.JButton btnToMenu;
-    private javax.swing.JButton btnToMenu1;
-    private javax.swing.JButton btnToMenu2;
-    private javax.swing.JButton btnToMenu3;
-    private javax.swing.JButton btnToMenu4;
     private javax.swing.JButton btnToMenu5;
+    private javax.swing.JButton btnToRiwayatTransaksi;
+    private javax.swing.JComboBox<String> cbBulan;
+    private javax.swing.JComboBox<String> cbTahun;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
     private javax.swing.JLabel jLabel45;
@@ -905,11 +1271,18 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel55;
     private javax.swing.JLabel jLabel56;
     private javax.swing.JLabel jLabel57;
+    private javax.swing.JLabel jLabel58;
+    private javax.swing.JLabel jLabel59;
+    private javax.swing.JLabel jLabel60;
+    private javax.swing.JLabel jLabel61;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JPanel kartuStok;
     private javax.swing.JPanel laporanKeluar;
     private javax.swing.JPanel laporanLaba;
     private javax.swing.JPanel laporanStok;
@@ -917,11 +1290,12 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel menuPanel;
     private javax.swing.JPanel riwayatTransaksi;
-    private javax.swing.JTable tblLaporan;
-    private javax.swing.JTable tblMenu;
+    private javax.swing.JTable tblKartuStok;
+    private javax.swing.JTable tblLaporanLaba;
+    private javax.swing.JTable tblLaporanPengeluaran;
     private javax.swing.JTable tblMenu2;
-    private javax.swing.JTable tblMenu3;
     private javax.swing.JTable tblMenu4;
+    private javax.swing.JTable tblRiwayatTransaksi;
     private javax.swing.JComboBox<String> txtJenisMenu;
     private javax.swing.JComboBox<String> txtJenisMenu1;
     private javax.swing.JComboBox<String> txtJenisMenu2;
@@ -932,5 +1306,6 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> txtJenisMenu7;
     private javax.swing.JComboBox<String> txtJenisMenu8;
     private javax.swing.JComboBox<String> txtJenisMenu9;
+    private javax.swing.JComboBox<String> txtPilihBahan;
     // End of variables declaration//GEN-END:variables
 }

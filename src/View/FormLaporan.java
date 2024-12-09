@@ -1142,7 +1142,7 @@ public class FormLaporan extends javax.swing.JFrame {
         
         try {
             //Menampilkan data kedalam tabel
-            String query = "SELECT tanggal, keterangan, jumlah_masuk, jumlah_keluar, saldo FROM kartu_stok WHERE id_bahan = ? ORDER BY tanggal, waktu ASC";
+            String query = "SELECT tanggal, keterangan, jumlah_masuk, jumlah_keluar, saldo FROM kartu_stok WHERE id_bahan = ? ORDER BY tanggal ASC";
             
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, idBahan);

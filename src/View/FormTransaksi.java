@@ -204,29 +204,17 @@ public class FormTransaksi extends javax.swing.JFrame {
             .addComponent(jLabel69, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(riwayatTransaksiLayout.createSequentialGroup()
                 .addGap(24, 24, 24)
-<<<<<<< HEAD (d3e5160) - fix: laporan kartu stok
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 645, Short.MAX_VALUE)
-=======
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 615, Short.MAX_VALUE)
->>>>>>> origin/main (6c6627c) - feat: tambah riw
                 .addGap(24, 24, 24))
         );
         riwayatTransaksiLayout.setVerticalGroup(
             riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, riwayatTransaksiLayout.createSequentialGroup()
-<<<<<<< HEAD (d3e5160) - fix: laporan kartu stok
                 .addGap(20, 20, 20)
                 .addComponent(jLabel69)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(48, Short.MAX_VALUE))
-=======
-                .addContainerGap()
-                .addComponent(jLabel69)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
-                .addGap(48, 48, 48))
->>>>>>> origin/main (6c6627c) - feat: tambah riw
         );
 
         mainPanel.add(riwayatTransaksi, "card2");
@@ -316,6 +304,8 @@ public class FormTransaksi extends javax.swing.JFrame {
         String idTransaksi = generateTransactionId(); // Get the new transaction ID
 
         try {
+            conn.setAutoCommit(false);
+            
             String transaksiQuery = "INSERT INTO transaksi (id_transaksi, id_user, id_pelanggan, jenis_pesanan, total_harga, total_pembayaran, kembalian, tanggal_transaksi, waktu_transaksi, status_pesanan) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             stmt = conn.prepareStatement(transaksiQuery, Statement.RETURN_GENERATED_KEYS);
@@ -497,9 +487,3 @@ public class FormTransaksi extends javax.swing.JFrame {
         }catch (Exception e) {}
     }
 }
-<<<<<<< HEAD (d3e5160) - fix: laporan kartu stok
-            conn.setAutoCommit(false);
-            
-=======
-
->>>>>>> origin/main (6c6627c) - feat: tambah riw

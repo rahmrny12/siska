@@ -1,4 +1,4 @@
-package Component.Transaction;
+package ComponentUI.Transaction;
 
 import java.sql.*;
 import javax.swing.*;

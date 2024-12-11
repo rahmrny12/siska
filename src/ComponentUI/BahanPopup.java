@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package Component;
+package ComponentUI;
 
-import Component.Transaction.MenuPanel;
+import ComponentUI.Transaction.MenuPanel;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;

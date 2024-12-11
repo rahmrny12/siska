@@ -4,6 +4,7 @@
  */
 package View;
 import Helper.PlaceholderHelper;
+import Helper.UserInfo;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.FocusEvent;
@@ -185,8 +186,14 @@ public class FormLogin extends javax.swing.JFrame {
             
             // Check if user exists
             if (rs.next()) {
+                int IDUser = rs.getInt("id_user");
                 String role = rs.getString("role");
 
+                UserInfo user = UserInfo.getInstance();
+                user.setIDUser(IDUser);
+                user.setUsername(username);
+                user.setRole(role);
+                
                 dispose();
                 
                 switch (role) {

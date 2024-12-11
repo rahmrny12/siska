@@ -4,7 +4,8 @@
  */
 package View;
 
-import Component.BahanPopup;
+import ComponentUI.BahanPopup;
+import ComponentUI.MessageDialog;
 import Helper.KartuStok;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,7 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.JTable;
@@ -333,6 +333,20 @@ public class FormMasterData extends javax.swing.JFrame {
         btnTambahBahan = new javax.swing.JButton();
         editBahan = new javax.swing.JButton();
         btnhHapusBahan = new javax.swing.JButton();
+        dataStokMasuk = new javax.swing.JPanel();
+        jLabel72 = new javax.swing.JLabel();
+        jLabel77 = new javax.swing.JLabel();
+        jLabel78 = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tblStokOpname1 = new javax.swing.JTable();
+        btnAddStokOpname1 = new javax.swing.JButton();
+        txtPilihBahan1 = new javax.swing.JComboBox<>();
+        txtStokFisik1 = new javax.swing.JSpinner();
+        labelStokSistem1 = new javax.swing.JLabel();
+        jLabel79 = new javax.swing.JLabel();
+        txtTanggalStopOpname1 = new javax.swing.JTextField();
+        btnSubmit1 = new javax.swing.JButton();
+        labelSatuanSistem1 = new javax.swing.JLabel();
         dataStokOpname = new javax.swing.JPanel();
         jLabel71 = new javax.swing.JLabel();
         jLabel74 = new javax.swing.JLabel();
@@ -1191,6 +1205,143 @@ public class FormMasterData extends javax.swing.JFrame {
 
         mainPanel.add(dataBahan, "card4");
 
+        dataStokMasuk.setBackground(new java.awt.Color(140, 2, 2));
+        dataStokMasuk.setMinimumSize(new java.awt.Dimension(666, 360));
+
+        jLabel72.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel72.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel72.setText("Bahan:");
+
+        jLabel77.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel77.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel77.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel77.setText("Data Stok Opname");
+
+        jLabel78.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel78.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel78.setText("Stok Fisik:");
+
+        tblStokOpname1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID Bahan", "Nama Bahan", "Stok Sistem", "Stok Fisik", "Selisih", "Aksi"
+            }
+        ));
+        tblStokOpname1.setRowHeight(40);
+        tblStokOpname1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblStokOpname1MouseClicked(evt);
+            }
+        });
+        jScrollPane8.setViewportView(tblStokOpname1);
+
+        btnAddStokOpname1.setText("TAMBAH");
+        btnAddStokOpname1.setPreferredSize(new java.awt.Dimension(65, 21));
+        btnAddStokOpname1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddStokOpname1ActionPerformed(evt);
+            }
+        });
+
+        txtPilihBahan1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        txtPilihBahan1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPilihBahan1ActionPerformed(evt);
+            }
+        });
+
+        labelStokSistem1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        labelStokSistem1.setForeground(new java.awt.Color(255, 255, 255));
+        labelStokSistem1.setText("Stok Sistem: -");
+
+        jLabel79.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel79.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel79.setText("Tanggal");
+
+        txtTanggalStopOpname1.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtTanggalStopOpname1.setEnabled(false);
+
+        btnSubmit1.setText("SUBMIT");
+        btnSubmit1.setPreferredSize(new java.awt.Dimension(65, 21));
+        btnSubmit1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSubmit1ActionPerformed(evt);
+            }
+        });
+
+        labelSatuanSistem1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        labelSatuanSistem1.setForeground(new java.awt.Color(255, 255, 255));
+        labelSatuanSistem1.setText("Satuan: -");
+
+        javax.swing.GroupLayout dataStokMasukLayout = new javax.swing.GroupLayout(dataStokMasuk);
+        dataStokMasuk.setLayout(dataStokMasukLayout);
+        dataStokMasukLayout.setHorizontalGroup(
+            dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel77, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataStokMasukLayout.createSequentialGroup()
+                .addGroup(dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(dataStokMasukLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSubmit1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(dataStokMasukLayout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 849, Short.MAX_VALUE)
+                            .addComponent(jLabel72)
+                            .addGroup(dataStokMasukLayout.createSequentialGroup()
+                                .addComponent(jLabel78)
+                                .addGap(18, 18, 18)
+                                .addGroup(dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btnAddStokOpname1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataStokMasukLayout.createSequentialGroup()
+                                        .addGroup(dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtStokFisik1)
+                                            .addComponent(txtPilihBahan1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(labelStokSistem1)
+                                            .addGroup(dataStokMasukLayout.createSequentialGroup()
+                                                .addComponent(labelSatuanSistem1)
+                                                .addGap(54, 54, 54)
+                                                .addComponent(jLabel79)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtTanggalStopOpname1)))))))))
+                .addGap(24, 24, 24))
+        );
+        dataStokMasukLayout.setVerticalGroup(
+            dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dataStokMasukLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jLabel77, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel72, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtPilihBahan1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(labelStokSistem1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(dataStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel78, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtStokFisik1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel79, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtTanggalStopOpname1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelSatuanSistem1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAddStokOpname1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnSubmit1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+
+        mainPanel.add(dataStokMasuk, "card3");
+
         dataStokOpname.setBackground(new java.awt.Color(140, 2, 2));
         dataStokOpname.setMinimumSize(new java.awt.Dimension(666, 360));
 
@@ -1332,7 +1483,7 @@ public class FormMasterData extends javax.swing.JFrame {
         bodyPanel.setLayout(bodyPanelLayout);
         bodyPanelLayout.setHorizontalGroup(
             bodyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 893, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(menuPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         bodyPanelLayout.setVerticalGroup(
@@ -1423,14 +1574,36 @@ public class FormMasterData extends javax.swing.JFrame {
         
         // Melakukan validasi input
         if (namaMenu.isEmpty() || jenisMenu == null || hargaMenu.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Semua kolom harus diisi!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         try{
             Integer.valueOf(hargaMenu);
         }catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Kolom harga harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Kolom harga harus berupa angka!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
         
         PreparedStatement stmt;
@@ -1448,7 +1621,18 @@ public class FormMasterData extends javax.swing.JFrame {
             loadTableMenu();
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal menambahkan data.",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
     }//GEN-LAST:event_btnTambahMenuActionPerformed
 
@@ -1461,19 +1645,52 @@ public class FormMasterData extends javax.swing.JFrame {
 
         // Melakukan validasi input
         if (IDMenu.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Pilih menu yang ingin diedit!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Pilih menu yang ingin diedit!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         if (namaMenu.isEmpty() || jenisMenu == null || hargaMenu.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Semua kolom harus diisi!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         try{
             Integer.valueOf(hargaMenu);
         }catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Kolom harga harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Kolom harga harus berupa angka!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
         
         PreparedStatement stmt;
@@ -1491,7 +1708,18 @@ public class FormMasterData extends javax.swing.JFrame {
             loadTableMenu();
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal mengedit data. ",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
     }//GEN-LAST:event_btnEditMenuActionPerformed
 
@@ -1499,33 +1727,51 @@ public class FormMasterData extends javax.swing.JFrame {
         String IDMenu = txtIDMenu.getText();
         
         if (IDMenu.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Pilih menu yang ingin dihapus!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Pilih menu yang ingin dihapus!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         // Konfirmasi sebelum menghapus
-        int confirmation = JOptionPane.showConfirmDialog(
-            this, 
-            "Apakah Anda yakin ingin menghapus menu tersebut?", 
-            "Konfirmasi Hapus", 
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
+        String[] buttonLabels = {"OK" , "NO"};
+
+        ActionListener yesAction = e -> {
+            PreparedStatement stmt;
+        
+            try {
+                String query = "DELETE FROM `menu` WHERE `id_menu` = ?";
+                stmt = conn.prepareStatement(query);
+                stmt.setInt(1, Integer.parseInt(IDMenu));
+                stmt.executeUpdate();
+
+                loadTableMenu();
+            } catch (SQLException ex) {}
+        };
+        ActionListener noAction = e -> {
+            return;
+        };
+
+
+        // Create a new instance of CustomDialog without actions
+        MessageDialog dialog = new MessageDialog(
+            "Konfirmasi Hapus",
+            "Apakah Anda yakin ingin menghapus Bahan tersebut?",
+            buttonLabels,
+            new ActionListener[]{yesAction, noAction}
         );
 
-        if (confirmation == JOptionPane.NO_OPTION) {
-            return;
-        }
-        
-        PreparedStatement stmt;
-        
-        try {
-            String query = "DELETE FROM `menu` WHERE `id_menu` = ?";
-            stmt = conn.prepareStatement(query);
-            stmt.setInt(1, Integer.parseInt(IDMenu));
-            stmt.executeUpdate();
-            
-            loadTableMenu();
-        } catch (SQLException ex) {}
+        // Show the dialog
+        dialog.showDialog();
     }//GEN-LAST:event_btnHapusMenuActionPerformed
 
     private void tblMenuMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMenuMouseClicked
@@ -1569,7 +1815,18 @@ public class FormMasterData extends javax.swing.JFrame {
         
         // Melakukan validasi input
         if (namaBahan.isEmpty() || satuan.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Semua kolom harus diisi!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
@@ -1586,7 +1843,18 @@ public class FormMasterData extends javax.swing.JFrame {
             loadTableBahan();
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal menambahkan data.",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
     
     }//GEN-LAST:event_btnTambahBahanActionPerformed
@@ -1599,12 +1867,34 @@ public class FormMasterData extends javax.swing.JFrame {
 
         // Melakukan validasi input
         if (IDBahan.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Pilih Bahan yang ingin diedit!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Pilih Bahan yang ingin diedit!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         if (namaBahan.isEmpty() || satuan.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Semua kolom harus diisi!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
@@ -1622,7 +1912,18 @@ public class FormMasterData extends javax.swing.JFrame {
             loadTableBahan();
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal mengedit data. ",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }   
     }//GEN-LAST:event_editBahanActionPerformed
 
@@ -1630,33 +1931,50 @@ public class FormMasterData extends javax.swing.JFrame {
         String IDBahan = txtIDBahan.getText();
         
         if (IDBahan.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Pilih Bahan yang ingin dihapus!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Pilih Bahan yang ingin dihapus!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         // Konfirmasi sebelum menghapus
-        int confirmation = JOptionPane.showConfirmDialog(
-            this, 
-            "Apakah Anda yakin ingin menghapus Bahan tersebut?", 
-            "Konfirmasi Hapus", 
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
+        String[] buttonLabels = {"OK", "NO"};
+
+        ActionListener yesAction = e -> {
+            PreparedStatement stmt;
+        
+            try {
+                String query = "DELETE FROM `Bahan` WHERE `id_bahan` = ?";
+                stmt = conn.prepareStatement(query);
+                stmt.setInt(1, Integer.parseInt(IDBahan));
+                stmt.executeUpdate();
+
+                loadTableBahan();
+            } catch (SQLException ex) {}
+        };
+        ActionListener noAction = e -> {
+            return;
+        };
+
+        // Create a new instance of CustomDialog without actions
+        MessageDialog dialog = new MessageDialog(
+            "Konfirmasi Hapus",
+            "Apakah Anda yakin ingin menghapus Bahan tersebut?",
+            buttonLabels,
+            new ActionListener[]{yesAction, noAction}
         );
 
-        if (confirmation == JOptionPane.NO_OPTION) {
-            return;
-        }
-        
-        PreparedStatement stmt;
-        
-        try {
-            String query = "DELETE FROM `Bahan` WHERE `id_bahan` = ?";
-            stmt = conn.prepareStatement(query);
-            stmt.setInt(1, Integer.parseInt(IDBahan));
-            stmt.executeUpdate();
-            
-            loadTableBahan();
-        } catch (SQLException ex) {}
+        // Show the dialog
+        dialog.showDialog();
     }//GEN-LAST:event_btnhHapusBahanActionPerformed
 
     private void btnToSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToSupplierActionPerformed
@@ -1712,14 +2030,36 @@ public class FormMasterData extends javax.swing.JFrame {
         
         // Melakukan validasi input        
         if (namaSupplier.isEmpty() || alamat.isEmpty() || noTelepon.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Semua kolom harus diisi!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         try{
             Integer.valueOf(noTelepon);
         }catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Kolom nomor telepon harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Kolom nomor telepon harus berupa angka!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
         
         PreparedStatement stmt;
@@ -1736,7 +2076,18 @@ public class FormMasterData extends javax.swing.JFrame {
             loadTableSupplier();
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal menambahkan data. ",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
     }//GEN-LAST:event_btnTambahSupplierActionPerformed
 
@@ -1749,19 +2100,52 @@ public class FormMasterData extends javax.swing.JFrame {
 
         // Melakukan validasi input
         if (IDSupplier.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Pilih menu yang ingin diedit!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Pilih menu yang ingin diedit!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         if (namaSupplier.isEmpty() || alamat == null || noTelepon.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Semua kolom harus diisi!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         try{
             Integer.valueOf(noTelepon);
         }catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Kolom nomor telepon harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+                // Create a new instance of CustomDialog without actions
+                MessageDialog dialog = new MessageDialog(
+                    "Error",
+                    "Kolom nomor telepon harus berupa angka!",
+                    buttonLabels,
+                    null // Pass null for default behavior (close dialog)
+                );
+
+                // Show the dialog
+                dialog.showDialog();
         }
         
         PreparedStatement stmt;
@@ -1779,7 +2163,18 @@ public class FormMasterData extends javax.swing.JFrame {
             loadTableSupplier();
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal mengedit data.",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }        
     }//GEN-LAST:event_editSupplierActionPerformed
 
@@ -1787,33 +2182,51 @@ public class FormMasterData extends javax.swing.JFrame {
         String IDSupplier = txtIDSupplier.getText();
         
         if (IDSupplier.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Pilih menu yang ingin dihapus!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Pilih menu yang ingin dihapus!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         // Konfirmasi sebelum menghapus
-        int confirmation = JOptionPane.showConfirmDialog(
-            this, 
-            "Apakah Anda yakin ingin menghapus menu tersebut?", 
-            "Konfirmasi Hapus", 
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
+        String[] buttonLabels = {"OK" , "NO"};
+
+        ActionListener yesAction = e -> {
+            PreparedStatement stmt;
+
+            try {
+                String query = "DELETE FROM `supplier` WHERE `id_supplier` = ?";
+                stmt = conn.prepareStatement(query);
+                stmt.setInt(1, Integer.parseInt(IDSupplier));
+                stmt.executeUpdate();
+
+                loadTableSupplier();
+            } catch (SQLException ex) {}
+        };
+        ActionListener noAction = e -> {
+            return;
+        };
+
+
+        // Create a new instance of CustomDialog without actions
+        MessageDialog dialog = new MessageDialog(
+            "Konfirmasi Hapus",
+            "Apakah Anda yakin ingin menghapus Bahan tersebut?",
+            buttonLabels,
+            new ActionListener[]{yesAction, noAction}
         );
 
-        if (confirmation == JOptionPane.NO_OPTION) {
-            return;
-        }
-        
-        PreparedStatement stmt;
-        
-        try {
-            String query = "DELETE FROM `supplier` WHERE `id_supplier` = ?";
-            stmt = conn.prepareStatement(query);
-            stmt.setInt(1, Integer.parseInt(IDSupplier));
-            stmt.executeUpdate();
-            
-            loadTableSupplier();
-        } catch (SQLException ex) {}
+        // Show the dialog
+        dialog.showDialog();
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void txtAlamatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAlamatActionPerformed
@@ -1824,33 +2237,51 @@ public class FormMasterData extends javax.swing.JFrame {
         String IDUser = txtIDUser.getText();
         
         if (IDUser.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Pilih user yang ingin dihapus!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Pilih user yang ingin dihapus!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
         // Konfirmasi sebelum menghapus
-        int confirmation = JOptionPane.showConfirmDialog(
-            this, 
-            "Apakah Anda yakin ingin menghapus user tersebut?", 
-            "Konfirmasi Hapus", 
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
+        String[] buttonLabels = {"OK" , "NO"};
+
+        ActionListener yesAction = e -> {
+            PreparedStatement stmt;
+
+            try {
+                String query = "DELETE FROM `user` WHERE `id_user` = ?";
+                stmt = conn.prepareStatement(query);
+                stmt.setInt(1, Integer.parseInt(IDUser));
+                stmt.executeUpdate();
+
+                loadTableUser();
+            } catch (SQLException ex) {}
+        };
+        ActionListener noAction = e -> {
+            return;
+        };
+
+
+        // Create a new instance of CustomDialog without actions
+        MessageDialog dialog = new MessageDialog(
+            "Konfirmasi Hapus",
+            "Apakah Anda yakin ingin menghapus Bahan tersebut?",
+            buttonLabels,
+            new ActionListener[]{yesAction, noAction}
         );
 
-        if (confirmation == JOptionPane.NO_OPTION) {
-            return;
-        }
-        
-        PreparedStatement stmt;
-        
-        try {
-            String query = "DELETE FROM `user` WHERE `id_user` = ?";
-            stmt = conn.prepareStatement(query);
-            stmt.setInt(1, Integer.parseInt(IDUser));
-            stmt.executeUpdate();
-            
-            loadTableUser();
-        } catch (SQLException ex) {}
+        // Show the dialog
+        dialog.showDialog();
     }//GEN-LAST:event_btnHapusUserActionPerformed
 
     private void btnEditUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditUserActionPerformed
@@ -1864,7 +2295,18 @@ public class FormMasterData extends javax.swing.JFrame {
 
         // Melakukan validasi input
         if (IDUser.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Pilih menu yang ingin diedit!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Pilih user yang ingin diedit!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
@@ -1872,7 +2314,18 @@ public class FormMasterData extends javax.swing.JFrame {
             username.isEmpty() ||
             email.isEmpty() ||
             password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Semua kolom harus diisi!",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
@@ -1893,7 +2346,18 @@ public class FormMasterData extends javax.swing.JFrame {
             loadTableUser();
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal mengedit data. ",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
     }//GEN-LAST:event_btnEditUserActionPerformed
 
@@ -1910,7 +2374,18 @@ public class FormMasterData extends javax.swing.JFrame {
             username.isEmpty() ||
             email.isEmpty() ||
             password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Semua kolom harus diisi! ",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             return;
         }
         
@@ -1931,7 +2406,18 @@ public class FormMasterData extends javax.swing.JFrame {
             loadTableUser();
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal menambahkan data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal menambahkan data. ",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
     }//GEN-LAST:event_btnTambahUserActionPerformed
 
@@ -1971,7 +2457,15 @@ public class FormMasterData extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddBahanMouseClicked
 
     private void btnToStokMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToStokMasukActionPerformed
-        // TODO add your handling code here:
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+
+        mainPanel.add(dataStokMasuk);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        loadDataStokBahan();
     }//GEN-LAST:event_btnToStokMasukActionPerformed
 
     private void tblStokOpnameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblStokOpnameMouseClicked
@@ -2187,7 +2681,18 @@ public class FormMasterData extends javax.swing.JFrame {
             model.setRowCount(0); // Clears all rows from the table
 
             // Optionally, show a message when done
-            JOptionPane.showMessageDialog(null, "Berhasil melakukan stok opname.");
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Success",
+                "Berhasil melakukan stok opname.",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
 
         } catch (SQLException e) {
             try {
@@ -2201,6 +2706,22 @@ public class FormMasterData extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnSubmitActionPerformed
+
+    private void tblStokOpname1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblStokOpname1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblStokOpname1MouseClicked
+
+    private void btnAddStokOpname1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddStokOpname1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAddStokOpname1ActionPerformed
+
+    private void txtPilihBahan1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPilihBahan1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPilihBahan1ActionPerformed
+
+    private void btnSubmit1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmit1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSubmit1ActionPerformed
         
     private void loadBahanMenu() {
         int IDMenu = Integer.parseInt(txtIDMenu.getText());
@@ -2255,15 +2776,9 @@ public class FormMasterData extends javax.swing.JFrame {
                 btnRemove.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        int confirmation = JOptionPane.showConfirmDialog(
-                            null, 
-                            "Apakah Anda yakin ingin menghapus bahan tersebut?", 
-                            "Konfirmasi Hapus", 
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE
-                        );
+                        String[] confirmButtonLabels = {"OK" , "NO"};
 
-                        if (confirmation == JOptionPane.YES_OPTION) {
+                        ActionListener yesAction = ev -> {
                             PreparedStatement stmt = null;
 
                             try {
@@ -2276,9 +2791,32 @@ public class FormMasterData extends javax.swing.JFrame {
                                 stmt.executeUpdate();
 
                                 loadBahanMenu();
-                                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Data berhasil ditambahkan.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                
+                                String[] buttonLabels = {"OK"};
+
+                                // Create a new instance of CustomDialog without actions
+                                MessageDialog dialog = new MessageDialog(
+                                    "Error",
+                                    "Data berhasil ditambahkan.",
+                                    buttonLabels,
+                                    null // Pass null for default behavior (close dialog)
+                                );
+
+                                // Show the dialog
+                                dialog.showDialog();
                             } catch (SQLException ex) {
-                                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Gagal mengubah data. " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                String[] buttonLabels = {"OK"};
+
+                                // Create a new instance of CustomDialog without actions
+                                MessageDialog dialog = new MessageDialog(
+                                    "Error",
+                                    "Gagal menghapus data. " + ex.getMessage(),
+                                    buttonLabels,
+                                    null // Pass null for default behavior (close dialog)
+                                );
+
+                                // Show the dialog
+                                dialog.showDialog();
                             } finally {
                                 // Ensure the statement is closed
                                 if (stmt != null) {
@@ -2289,7 +2827,21 @@ public class FormMasterData extends javax.swing.JFrame {
                                     }
                                 }
                             }
-                        }
+                        };
+                        ActionListener noAction = ev -> {
+                            return;
+                        };
+
+                        // Create a new instance of CustomDialog without actions
+                        MessageDialog dialog = new MessageDialog(
+                            "Konfirmasi Hapus",
+                            "Apakah Anda yakin ingin menghapus bahan tersebut?",
+                            confirmButtonLabels,
+                            new ActionListener[]{yesAction, noAction}
+                        );
+
+                        // Show the dialog
+                        dialog.showDialog();
                     }
                 });
 
@@ -2325,7 +2877,18 @@ public class FormMasterData extends javax.swing.JFrame {
             String IDMenu = txtIDMenu.getText(); // Get IDMenu from the JTextField
 
             if (IDMenu.isEmpty()) {
-                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Pilih menu yang ingin diubah.", "Error", JOptionPane.WARNING_MESSAGE);
+                String[] buttonLabels = {"OK"};
+
+                // Create a new instance of CustomDialog without actions
+                MessageDialog dialog = new MessageDialog(
+                    "Error",
+                    "Pilih menu yang ingin diubah.",
+                    buttonLabels,
+                    null // Pass null for default behavior (close dialog)
+                );
+
+                // Show the dialog
+                dialog.showDialog();
                 return;
             }
 
@@ -2342,9 +2905,32 @@ public class FormMasterData extends javax.swing.JFrame {
 
                 // Refresh the table to reflect the new data
                 loadBahanMenu();
-                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Data berhasil ditambahkan.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                
+                String[] buttonLabels = {"OK"};
+
+                // Create a new instance of CustomDialog without actions
+                MessageDialog dialog = new MessageDialog(
+                    "Success",
+                    "Data berhasil ditambahkan.",
+                    buttonLabels,
+                    null // Pass null for default behavior (close dialog)
+                );
+
+                // Show the dialog
+                dialog.showDialog();
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(btnAddBahan.getParent(), "Gagal menambahkan data. " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                String[] buttonLabels = {"OK"};
+
+                // Create a new instance of CustomDialog without actions
+                MessageDialog dialog = new MessageDialog(
+                    "Error",
+                    "Gagal menghapus data. " + ex.getMessage(),
+                    buttonLabels,
+                    null // Pass null for default behavior (close dialog)
+                );
+
+                // Show the dialog
+                dialog.showDialog();
             } finally {
                 // Ensure the statement is closed
                 if (stmt != null) {
@@ -2397,6 +2983,7 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JPanel bodyPanel;
     private javax.swing.JLabel btnAddBahan;
     private javax.swing.JButton btnAddStokOpname;
+    private javax.swing.JButton btnAddStokOpname1;
     private javax.swing.JButton btnBatal;
     private javax.swing.JButton btnEditMenu;
     private javax.swing.JButton btnEditUser;
@@ -2404,6 +2991,7 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JButton btnHapusUser;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnSubmit;
+    private javax.swing.JButton btnSubmit1;
     private javax.swing.JButton btnTambahBahan;
     private javax.swing.JButton btnTambahMenu;
     private javax.swing.JButton btnTambahSupplier;
@@ -2417,6 +3005,7 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JButton btnhHapusBahan;
     private javax.swing.JPanel dataBahan;
     private javax.swing.JPanel dataMenu;
+    private javax.swing.JPanel dataStokMasuk;
     private javax.swing.JPanel dataStokOpname;
     private javax.swing.JPanel dataSupplier;
     private javax.swing.JPanel dataUser;
@@ -2446,16 +3035,23 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel69;
     private javax.swing.JLabel jLabel70;
     private javax.swing.JLabel jLabel71;
+    private javax.swing.JLabel jLabel72;
     private javax.swing.JLabel jLabel74;
     private javax.swing.JLabel jLabel75;
     private javax.swing.JLabel jLabel76;
+    private javax.swing.JLabel jLabel77;
+    private javax.swing.JLabel jLabel78;
+    private javax.swing.JLabel jLabel79;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JLabel labelSatuanSistem;
+    private javax.swing.JLabel labelSatuanSistem1;
     private javax.swing.JLabel labelStokSistem;
+    private javax.swing.JLabel labelStokSistem1;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel menuPanel;
     private javax.swing.JPanel panelBahan;
@@ -2463,6 +3059,7 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JTable tblBahan;
     private javax.swing.JTable tblMenu;
     private javax.swing.JTable tblStokOpname;
+    private javax.swing.JTable tblStokOpname1;
     private javax.swing.JTable tblSupplier;
     private javax.swing.JTable tblUser;
     private javax.swing.JTextField txtAlamat;
@@ -2480,10 +3077,13 @@ public class FormMasterData extends javax.swing.JFrame {
     private javax.swing.JTextField txtNoTelepon;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JComboBox<String> txtPilihBahan;
+    private javax.swing.JComboBox<String> txtPilihBahan1;
     private javax.swing.JComboBox<String> txtRole;
     private javax.swing.JTextField txtSatuan;
     private javax.swing.JSpinner txtStokFisik;
+    private javax.swing.JSpinner txtStokFisik1;
     private javax.swing.JTextField txtTanggalStopOpname;
+    private javax.swing.JTextField txtTanggalStopOpname1;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

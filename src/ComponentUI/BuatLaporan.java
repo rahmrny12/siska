@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package Component;
+package ComponentUI;
 
+import Helper.UserInfo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,11 +15,16 @@ public class BuatLaporan extends javax.swing.JFrame {
 
     private Connection conn;
     
+    private Integer IDUser = null;
+    
     /**
      * Creates new form PaymentForm
      */
     public BuatLaporan() {
         initComponents();
+        
+        UserInfo user = UserInfo.getInstance();
+        IDUser = user.getIDUser();
         
         this.setLocationRelativeTo(null);
         
@@ -134,46 +140,60 @@ public class BuatLaporan extends javax.swing.JFrame {
         int totalPengeluaran = Integer.parseInt(txtTotalPengeluaran.getText());
         String deskripsiPengeluaran =(txtDeskripsiPengeluaran.getText());
         
-        
         PreparedStatement stmt;
         
         try {
             // Membuat query mysql
-            String query = "INSERT INTO `laporan_pengeluaran`(`tanggal_laporan`, `deskripsi_pengeluaran`, `total_pengeluaran`) VALUES (?,?,?)";
+            String query = "INSERT INTO `laporan_pengeluaran`(`id_user`, `tanggal_laporan`, `deskripsi_pengeluaran`, `total_pengeluaran`) VALUES (?,?,?,?)";
             stmt = conn.prepareStatement(query);
-            stmt.setDate(1, new java.sql.Date(System.currentTimeMillis()));
-            stmt.setString(2, deskripsiPengeluaran);
-            stmt.setInt(3, totalPengeluaran);
+            
+            java.sql.Date nowDate = new java.sql.Date(System.currentTimeMillis());
+            
+            if (IDUser == null) {
+                stmt.setNull(1, java.sql.Types.INTEGER);  // Handle as NULL in SQL
+            } else {
+                stmt.setInt(1, IDUser);  // Set actual value if it's not null
+            }
+            
+            stmt.setDate(2, nowDate);
+            stmt.setString(3, deskripsiPengeluaran);
+            stmt.setInt(4, totalPengeluaran);
             stmt.execute();
             
-            // Assume tanggalTransaksi is a variable holding the date, for example:
-String tanggalTransaksi = "2024-11-28";  // Replace with your actual variable
-
-// First, calculate total pendapatan from transaksi table
-String queryPendapatan = "SELECT SUM(total_harga) as total_pendapatan FROM transaksi WHERE tanggal_transaksi = ?";
-stmt = conn.prepareStatement(queryPendapatan);
-stmt.setString(1, tanggalTransaksi);  // Set the variable tanggalTransaksi as a parameter
-ResultSet rsPendapatan = stmt.executeQuery();
-int totalPendapatan = 0;
-if (rsPendapatan.next()) {
-    totalPendapatan = rsPendapatan.getInt("total_pendapatan");
-}
-
-// Calculate laba bersih
-int labaBersih = totalPendapatan - totalPengeluaran;
-
-// Insert the data into laporan_laba
-String queryLaba = "INSERT INTO laporan_laba (tanggal_laporan, total_pendapatan, total_pengeluaran, laba_bersih) VALUES (?, ?, ?, ?)";
-stmt = conn.prepareStatement(queryLaba);
-stmt.setString(1, tanggalTransaksi);  // Use the same date for laporan_laba
-stmt.setInt(2, totalPendapatan);
-stmt.setInt(3, totalPengeluaran);
-stmt.setInt(4, labaBersih);
-stmt.execute();
-
-         
-          
+            // First, calculate total pendapatan from transaksi table
+            String queryPendapatan = "SELECT SUM(total_harga) as total_pendapatan FROM transaksi WHERE tanggal_transaksi = ?";
+            stmt = conn.prepareStatement(queryPendapatan);
+            stmt.setDate(1, nowDate);  // Set the variable tanggalTransaksi as a parameter
+            ResultSet rsPendapatan = stmt.executeQuery();
+            int totalPendapatan = 0;
+            if (rsPendapatan.next()) {
+                totalPendapatan = rsPendapatan.getInt("total_pendapatan");
+            }
             
+            if (totalPendapatan == 0) {
+                System.out.println("Belum ada transaksi hari ini.");
+                return;
+            }
+
+            // Calculate laba bersih
+            int labaBersih = totalPendapatan - totalPengeluaran;
+
+            // Insert the data into laporan_laba
+            String queryLaba = "INSERT INTO laporan_laba (tanggal_laporan, total_pendapatan, total_pengeluaran, laba_bersih, id_user) VALUES (?, ?, ?, ?, ?)";
+            stmt = conn.prepareStatement(queryLaba);
+            stmt.setDate(1, nowDate);  // Use the same date for laporan_laba
+            stmt.setInt(2, totalPendapatan);
+            stmt.setInt(3, totalPengeluaran);
+            stmt.setInt(4, labaBersih);
+            
+            if (IDUser == null) {
+                stmt.setNull(5, java.sql.Types.INTEGER);  // Handle as NULL in SQL
+            } else {
+                stmt.setInt(5, IDUser);  // Set actual value if it's not null
+            }
+            
+            stmt.execute();
+
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Gagal menambahkan data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }

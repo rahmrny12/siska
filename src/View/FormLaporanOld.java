@@ -4,29 +4,22 @@
  */
 package View;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.DefaultCategoryDataset;
 import ComponentUI.BuatLaporan;
-import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
-import org.jfree.chart.plot.PlotOrientation;
 
-public class FormLaporan extends javax.swing.JFrame {
+public class FormLaporanOld extends javax.swing.JFrame {
 
     private Connection conn;
     
     private HashMap<String, Object[]> dataStokBahan = new HashMap<>();
     
-    public FormLaporan() {
+    public FormLaporanOld() {
         initComponents();
         
         conn = Helper.Database.OpenConnection();
@@ -135,19 +128,14 @@ public class FormLaporan extends javax.swing.JFrame {
         btnToMenu5 = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
         riwayatTransaksi = new javax.swing.JPanel();
+        jLabel45 = new javax.swing.JLabel();
+        jLabel46 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblRiwayatTransaksi = new javax.swing.JTable();
         jLabel49 = new javax.swing.JLabel();
-        btnBuatLaporan = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel45 = new javax.swing.JLabel();
         txtJenisMenu2 = new javax.swing.JComboBox<>();
-        jLabel46 = new javax.swing.JLabel();
         txtJenisMenu3 = new javax.swing.JComboBox<>();
-        Dashboard = new javax.swing.JPanel();
-        jLabel64 = new javax.swing.JLabel();
-        chartContainerPanel = new javax.swing.JPanel();
-        panelProduk = new javax.swing.JPanel();
+        btnBuatLaporan = new javax.swing.JButton();
         laporanStok = new javax.swing.JPanel();
         jLabel47 = new javax.swing.JLabel();
         jLabel50 = new javax.swing.JLabel();
@@ -316,6 +304,14 @@ public class FormLaporan extends javax.swing.JFrame {
 
         riwayatTransaksi.setBackground(new java.awt.Color(144, 2, 2));
 
+        jLabel45.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jLabel45.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel45.setText("Bulan");
+
+        jLabel46.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jLabel46.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel46.setText("Tahun");
+
         tblRiwayatTransaksi.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         tblRiwayatTransaksi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -340,22 +336,6 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel49.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel49.setText("Riwayat Transaksi");
 
-        btnBuatLaporan.setBackground(new java.awt.Color(204, 204, 204));
-        btnBuatLaporan.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnBuatLaporan.setForeground(new java.awt.Color(51, 51, 51));
-        btnBuatLaporan.setText("Buat Laporan");
-        btnBuatLaporan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuatLaporanActionPerformed(evt);
-            }
-        });
-
-        jPanel2.setBackground(new java.awt.Color(144, 2, 2));
-
-        jLabel45.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        jLabel45.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel45.setText("Bulan");
-
         txtJenisMenu2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtJenisMenu2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
         txtJenisMenu2.setPreferredSize(new java.awt.Dimension(64, 22));
@@ -364,10 +344,6 @@ public class FormLaporan extends javax.swing.JFrame {
                 txtJenisMenu2ActionPerformed(evt);
             }
         });
-
-        jLabel46.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        jLabel46.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel46.setText("Tahun");
 
         txtJenisMenu3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtJenisMenu3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026" }));
@@ -378,47 +354,40 @@ public class FormLaporan extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtJenisMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(34, 34, 34)
-                .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtJenisMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtJenisMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtJenisMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(12, Short.MAX_VALUE))
-        );
+        btnBuatLaporan.setBackground(new java.awt.Color(204, 204, 204));
+        btnBuatLaporan.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnBuatLaporan.setForeground(new java.awt.Color(51, 51, 51));
+        btnBuatLaporan.setText("Buat Laporan");
+        btnBuatLaporan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuatLaporanActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout riwayatTransaksiLayout = new javax.swing.GroupLayout(riwayatTransaksi);
         riwayatTransaksi.setLayout(riwayatTransaksiLayout);
         riwayatTransaksiLayout.setHorizontalGroup(
             riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, riwayatTransaksiLayout.createSequentialGroup()
-                .addGap(24, 24, 24)
                 .addGroup(riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel49, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane4)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, riwayatTransaksiLayout.createSequentialGroup()
-                        .addGap(0, 312, Short.MAX_VALUE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(164, 164, 164)
-                        .addComponent(btnBuatLaporan)))
+                        .addGap(309, 309, 309)
+                        .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtJenisMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34)
+                        .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtJenisMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnBuatLaporan))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, riwayatTransaksiLayout.createSequentialGroup()
+                        .addGap(163, 163, 163)
+                        .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 170, Short.MAX_VALUE))
+                    .addGroup(riwayatTransaksiLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 948, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(24, 24, 24))
         );
         riwayatTransaksiLayout.setVerticalGroup(
@@ -426,57 +395,19 @@ public class FormLaporan extends javax.swing.JFrame {
             .addGroup(riwayatTransaksiLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(btnBuatLaporan, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(12, 12, 12)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
-                .addGap(24, 24, 24))
+                .addGap(18, 18, 18)
+                .addGroup(riwayatTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtJenisMenu2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtJenisMenu3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBuatLaporan, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(77, Short.MAX_VALUE))
         );
 
         mainPanel.add(riwayatTransaksi, "card2");
-
-        Dashboard.setBackground(new java.awt.Color(144, 2, 2));
-
-        jLabel64.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
-        jLabel64.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel64.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel64.setText("Dashboard");
-
-        chartContainerPanel.setLayout(new java.awt.BorderLayout());
-
-        panelProduk.setLayout(new java.awt.BorderLayout());
-
-        javax.swing.GroupLayout DashboardLayout = new javax.swing.GroupLayout(Dashboard);
-        Dashboard.setLayout(DashboardLayout);
-        DashboardLayout.setHorizontalGroup(
-            DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(DashboardLayout.createSequentialGroup()
-                .addGroup(DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(DashboardLayout.createSequentialGroup()
-                        .addGap(167, 167, 167)
-                        .addComponent(jLabel64, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(DashboardLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(chartContainerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(panelProduk, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(75, Short.MAX_VALUE))
-        );
-        DashboardLayout.setVerticalGroup(
-            DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(DashboardLayout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(jLabel64, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
-                .addGroup(DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(chartContainerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panelProduk, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(347, Short.MAX_VALUE))
-        );
-
-        mainPanel.add(Dashboard, "card2");
 
         laporanStok.setBackground(new java.awt.Color(144, 2, 2));
 
@@ -551,7 +482,7 @@ public class FormLaporan extends javax.swing.JFrame {
                     .addGroup(laporanStokLayout.createSequentialGroup()
                         .addGap(167, 167, 167)
                         .addComponent(jLabel51, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(132, Short.MAX_VALUE))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
         laporanStokLayout.setVerticalGroup(
             laporanStokLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -644,7 +575,7 @@ public class FormLaporan extends javax.swing.JFrame {
                         .addComponent(jLabel53, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtJenisMenu7, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(132, Short.MAX_VALUE))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
         laporanKeluarLayout.setVerticalGroup(
             laporanKeluarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -737,7 +668,7 @@ public class FormLaporan extends javax.swing.JFrame {
                     .addGroup(laporanLabaLayout.createSequentialGroup()
                         .addGap(166, 166, 166)
                         .addComponent(jLabel48, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(132, Short.MAX_VALUE))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
         laporanLabaLayout.setVerticalGroup(
             laporanLabaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -830,7 +761,7 @@ public class FormLaporan extends javax.swing.JFrame {
                         .addComponent(jLabel56, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cbTahun, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(132, Short.MAX_VALUE))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
         laporanStokMasukLayout.setVerticalGroup(
             laporanStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1010,117 +941,9 @@ public class FormLaporan extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnToMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenuActionPerformed
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(Dashboard);
-        mainPanel.repaint();
-        mainPanel.revalidate();
         
-        loadDataProfit();
-        loadDataProduk();
     }//GEN-LAST:event_btnToMenuActionPerformed
 
-    private void loadDataProfit() {
-        // Membuat dataset untuk chart
-        DefaultCategoryDataset dataset = createDatasetProfit();
-        
-        // Membuat chart
-        JFreeChart chart = ChartFactory.createLineChart(
-                "Laba Bersih per Tanggal", // Judul chart
-                "Tanggal", // Label sumbu X
-                "Laba Bersih", // Label sumbu Y
-                dataset, // Dataset
-                PlotOrientation.VERTICAL, // Orientasi plot vertikal
-                true, // Menampilkan legend
-                true, // Menampilkan tooltips
-                false // Tidak menampilkan URL
-        );
-        
-        // Menambahkan chart ke dalam panel
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(600, 600));
-//        setContentPane(chartPanel);
-        chartContainerPanel.add(chartPanel, BorderLayout.CENTER);
-        chartContainerPanel.validate();
-    }
-
-    private DefaultCategoryDataset createDatasetProfit() {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        // SQL query untuk mengambil data dari tabel laporan_laba
-        String sql = "SELECT tanggal_laporan, laba_bersih FROM laporan_laba ORDER BY tanggal_laporan";
-
-        try {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            // Mengambil data dari hasil query dan menambahkannya ke dataset
-            while (rs.next()) {
-                String tanggal = rs.getString("tanggal_laporan");
-                int labaBersih = rs.getInt("laba_bersih");
-
-                // Menambahkan data ke dataset (Label untuk sumbu Y adalah "Laba Bersih" dan tanggal untuk sumbu X)
-                dataset.addValue(labaBersih, "Laba Bersih", tanggal);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return dataset;
-    }
-    
-    private void loadDataProduk() {
-        // Membuat dataset untuk chart
-        DefaultCategoryDataset dataset = createDatasetProduk();
-        
-        // Membuat chart
-        JFreeChart chart = ChartFactory.createBarChart(
-                "Produk Terjual Per Tanggal", // Judul chart
-                "Nama Menu", // Label sumbu X
-                "Jumlah Terjual", // Label sumbu Y
-                dataset, // Dataset
-                PlotOrientation.VERTICAL, // Orientasi plot vertikal
-                true, // Menampilkan legend
-                true, // Menampilkan tooltips
-                false // Tidak menampilkan URL
-        );
-        
-        // Menambahkan chart ke dalam panel
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(600, 600));
-//        setContentPane(chartPanel);
-        panelProduk.add(chartPanel, BorderLayout.CENTER);
-        panelProduk.validate();
-    }
-
-    private DefaultCategoryDataset createDatasetProduk() {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        // SQL query untuk mengambil data dari tabel laporan_laba
-        String sql = "SELECT transaksi.tanggal_transaksi, menu.nama_menu, SUM(detail_transaksi.kuantitas) AS total FROM transaksi INNER JOIN detail_transaksi ON transaksi.id_transaksi=detail_transaksi.id_transaksi INNER JOIN menu ON detail_transaksi.id_menu = menu.id_menu group BY menu.id_menu order by total DESC";
-
-        try {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            // Mengambil data dari hasil query dan menambahkannya ke dataset
-            while (rs.next()) {
-                String nama_menu = rs.getString("nama_menu");
-                int kuantitas = rs.getInt ("total");
-
-                // Menambahkan data ke dataset (Label untuk sumbu Y adalah "Laba Bersih" dan tanggal untuk sumbu X)
-                dataset.addValue(kuantitas, "nama_menu", nama_menu);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return dataset;
-    }
-
-    
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         dispose(); // this will close current login box window
 
@@ -1427,7 +1250,6 @@ public class FormLaporan extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel Dashboard;
     private javax.swing.JPanel bodyPanel;
     private javax.swing.JButton btnBuatLaporan;
     private javax.swing.JButton btnEkspor;
@@ -1440,7 +1262,6 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JButton btnToRiwayatTransaksi;
     private javax.swing.JComboBox<String> cbBulan;
     private javax.swing.JComboBox<String> cbTahun;
-    private javax.swing.JPanel chartContainerPanel;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
     private javax.swing.JLabel jLabel45;
@@ -1460,9 +1281,7 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel59;
     private javax.swing.JLabel jLabel60;
     private javax.swing.JLabel jLabel61;
-    private javax.swing.JLabel jLabel64;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
@@ -1476,7 +1295,6 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JPanel laporanStokMasuk;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel menuPanel;
-    private javax.swing.JPanel panelProduk;
     private javax.swing.JPanel riwayatTransaksi;
     private javax.swing.JTable tblKartuStok;
     private javax.swing.JTable tblLaporanLaba;
@@ -1496,47 +1314,4 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> txtJenisMenu9;
     private javax.swing.JComboBox<String> txtPilihBahan;
     // End of variables declaration//GEN-END:variables
-
-    private void loadDashboard() {
-        try {
-            // Ambil data dari database
-            String query = "SELECT tanggal_laporan,laba_bersih FROM laporan_laba";
-            PreparedStatement stmt = conn.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-
-            // Membuat dataset untuk grafik
-            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-            while (rs.next()) {
-                String tanggal_laporan = rs.getString("tanggal_laporan");
-                int laba_bersih = rs.getInt("laba_bersih");
-                dataset.addValue(laba_bersih, "laba_bersih", String.valueOf(tanggal_laporan));
-            }
-
-            // Membuat grafik garis
-            JFreeChart lineChart = ChartFactory.createLineChart(
-                    "Grafik Garis dari Database", // Judul
-                    "Tanggal",                     // Label sumbu X
-                    "Profit",                     // Label sumbu Y
-                    dataset,                     // Dataset
-                    org.jfree.chart.plot.PlotOrientation.VERTICAL, // Orientasi
-                    true,                        // Legenda
-                    true,                        // Tooltips
-                    false                        // URLs
-            );
-
-            // Menampilkan grafik di dalam JFrame
-            ChartPanel chartPanel = new ChartPanel(lineChart);
-            JFrame frame = new JFrame("Grafik Garis dari Database");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(800, 600);
-            frame.add(chartPanel);
-            frame.setVisible(true);
-            
-            
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

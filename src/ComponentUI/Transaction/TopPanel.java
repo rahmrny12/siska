@@ -1,4 +1,4 @@
-package Component.Transaction;
+package ComponentUI.Transaction;
 
 import javax.swing.*;
 import java.awt.*;

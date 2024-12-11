@@ -1,29 +1,44 @@
-package Component.Transaction;
+package ComponentUI.Transaction;
 
-import Component.Transaction.PaymentPopup.PaymentListener;
+import ComponentUI.MessageDialog;
+import ComponentUI.Transaction.PaymentPopup.PaymentListener;
 import Model.OrderItem;
 import View.FormTransaksi;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LeftPanel extends JPanel {
 
+    private Connection conn;
+    
     private JPanel orderSummaryPanel;
     private JLabel totalLabel;
+    private JTextField txtName;
+    private JTextField txtPhone;
     
     private FormTransaksi formTransaksi;
-    private Map<Integer, OrderItem> orderItems = new HashMap<>();
+    private Map<Integer, OrderItem> orderItems = new LinkedHashMap<>();
     private int totalHarga = 0;
+    private Integer IDPelanggan = null;
     
     Map<String, Integer> dataTopping = new LinkedHashMap<>();
     Map<String, Integer> dataLevel = new LinkedHashMap<>();
     
     public LeftPanel() {
+        conn = Helper.Database.OpenConnection();
+        
         dataTopping.put("None", 0);
         dataTopping.put("Dumpling", 1000);
         dataTopping.put("Telur", 3000);
@@ -45,6 +60,7 @@ public class LeftPanel extends JPanel {
 
         // Total Label
         totalLabel = new JLabel("Total: Rp. 0");
+        totalLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         totalLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         // Set layout for the main panel
@@ -62,19 +78,109 @@ public class LeftPanel extends JPanel {
             PaymentPopup paymentPopup = new PaymentPopup();
             paymentPopup.setTotalHarga(totalHarga);
             paymentPopup.setPaymentActionListener((int totalPembayaran, int totalKembalian) -> {
+                // Create pelanggan jika belum ada
+                String namaPelanggan;
+                
+                if (IDPelanggan == null) {
+                    // Check if one of the fields is empty but not both
+                    if ((txtName.getText().isEmpty() || txtPhone.getText().isEmpty()) 
+                        && !(txtName.getText().isEmpty() && txtPhone.getText().isEmpty())) {
+                        // Show warning dialog if one field is incomplete
+                        String[] buttonLabels = {"OK"};
+
+                        // Create a new instance of CustomDialog
+                        MessageDialog dialog = new MessageDialog(
+                            "Error",
+                            "Kolom pelanggan tidak lengkap.",
+                            buttonLabels,
+                            null // Pass null for default behavior (close dialog)
+                        );
+
+                        // Show the dialog
+                        dialog.showDialog();
+                        return; // Stop further execution
+                    }
+
+                    // If both fields are empty, do nothing and keep IDPelanggan as null
+                    if (!txtName.getText().isEmpty() && !txtPhone.getText().isEmpty()) {
+                        createNewPelanggan();
+                    }
+                }
+                
+                namaPelanggan = txtName.getText();
+                
                 // Update FormTransaksi with payment data
-                formTransaksi.submitTransaction(orderItems, totalPembayaran, totalKembalian);
+                formTransaksi.submitTransaction(orderItems, totalPembayaran, totalKembalian, IDPelanggan, namaPelanggan);
                 
                 paymentPopup.dispose();
                 orderItems.clear();
                 orderSummaryPanel.removeAll();
                 orderSummaryPanel.revalidate();
                 orderSummaryPanel.repaint();
+                IDPelanggan = null;
+                txtName.setText("");
+                txtPhone.setText("");
                 
                 totalLabel.setText("Total: Rp. 0");
             });
             paymentPopup.setVisible(true);
         });
+        
+        // Panel for text fields
+        JPanel customerPanel = new JPanel();
+        customerPanel.setLayout(new GridLayout(2, 2, 5, 5)); // 2 rows, 2 columns, 5px gap
+        customerPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        // "Nama Pelanggan" field
+        JLabel nameLabel = new JLabel("Nama Pelanggan:");
+        txtName = new JTextField();
+
+        // "Nomor Telepon" field
+        JLabel phoneLabel = new JLabel("Nomor Telepon:");
+        txtPhone = new JTextField();
+        txtPhone.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String nomorTelepon = txtPhone.getText();
+                if (!nomorTelepon.isEmpty()) {
+                    // Perform search query
+                    PreparedStatement stmt;
+                    
+                    try {
+                        String query = "SELECT * FROM pelanggan WHERE no_telp = ?";
+                        stmt = conn.prepareStatement(query);
+                        stmt.setString(1, nomorTelepon);
+
+                        ResultSet rs = stmt.executeQuery();
+                        if (rs.next()) {
+                            // Populate Nama Pelanggan field
+                            IDPelanggan = rs.getInt("id_pelanggan");
+                            String namaPelanggan = rs.getString("nama");
+                            txtName.setText(namaPelanggan);
+                            txtName.setEnabled(false);
+                        } else {
+                            // Clear the name field if no match is found
+                            IDPelanggan = null;
+                            txtName.setEnabled(true);
+                        }
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    // Clear the name field if phone field is empty
+                    txtName.setText("");
+                }
+            }
+        });
+
+        
+        customerPanel.add(phoneLabel);
+        customerPanel.add(txtPhone);
+        customerPanel.add(nameLabel);
+        customerPanel.add(txtName);
+
+        // Add the textFieldPanel to the top of the bottomPanel
+        bottomPanel.add(customerPanel, BorderLayout.NORTH);
         
         bottomPanel.add(totalLabel, BorderLayout.CENTER);
         bottomPanel.add(payButton, BorderLayout.SOUTH);
@@ -212,5 +318,45 @@ public class LeftPanel extends JPanel {
 
     public void setFormTransaksi(FormTransaksi formTransaksi) {
         this.formTransaksi = formTransaksi;
+    }
+
+    private void createNewPelanggan() {
+        PreparedStatement stmt;
+        
+        try {
+            String query = "INSERT INTO `pelanggan`(`nama`, `no_telp`) VALUES (?, ?)";
+            stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+            // Replace with your values
+            String namaPelanggan = txtName.getText();
+            String nomorTelepon = txtPhone.getText();
+
+            // Set the parameters
+            stmt.setString(1, namaPelanggan);
+            stmt.setString(2, nomorTelepon);
+
+            // Execute the insert statement
+            int rowsInserted = stmt.executeUpdate();
+            if (rowsInserted > 0) {
+                // Retrieve the generated keys
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    IDPelanggan = generatedKeys.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal menambahkan data.",
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
+        }
     }
 }

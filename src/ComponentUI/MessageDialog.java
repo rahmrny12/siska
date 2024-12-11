@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Component;
+package ComponentUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -13,11 +13,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -25,12 +27,13 @@ import javax.swing.border.EmptyBorder;
  *
  * @author LENOVO
  */
-public class CustomDialog {
+public class MessageDialog {
 
     private final String title;
     private final String message;
     private final String[] buttonLabels;
     private final ActionListener[] actions;
+    private JButton defaultButton;
 
     /**
      * Constructor to initialize the dialog components.
@@ -40,7 +43,7 @@ public class CustomDialog {
      * @param buttonLabels Array of button labels.
      * @param actions      Array of ActionListener corresponding to each button (nullable).
      */
-    public CustomDialog(String title, String message, String[] buttonLabels, ActionListener[] actions) {
+    public MessageDialog(String title, String message, String[] buttonLabels, ActionListener[] actions) {
         this.title = title;
         this.message = message;
         this.buttonLabels = buttonLabels;
@@ -76,8 +79,8 @@ public class CustomDialog {
         backgroundPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Add a message label
-        JLabel messageLabel = new JLabel(message);
-        messageLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        JLabel messageLabel = new JLabel("<html><div style='text-align: center;'>" + message.replace("\n", "<br>") + "</div></html>");
+        messageLabel.setFont(new Font("Arial", Font.BOLD, 16));
         messageLabel.setForeground(Color.WHITE);
         messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -92,6 +95,9 @@ public class CustomDialog {
             if (actions != null && i < actions.length && actions[i] != null) {
                 button.addActionListener(actions[i]);
             }
+            if (i == 0) { // Assign the first button as the default
+                defaultButton = button;
+            }
             buttonPanel.add(button);
         }
 
@@ -101,6 +107,17 @@ public class CustomDialog {
 
         // Add the custom panel to the dialog
         dialog.setContentPane(backgroundPanel);
+
+        // Add Key Binding for the Enter key
+        if (defaultButton != null) {
+            backgroundPanel.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ENTER"), "pressEnter");
+            backgroundPanel.getActionMap().put("pressEnter", new AbstractAction() {
+                @Override
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    defaultButton.doClick(); // Trigger the default button
+                }
+            });
+        }
 
         // Show the dialog
         dialog.setVisible(true);

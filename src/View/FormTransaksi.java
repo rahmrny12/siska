@@ -5,19 +5,34 @@
 package View;
 
 import Helper.KartuStok;
+import Helper.Struk;
+import Helper.UserInfo;
 import Model.Menu;
 import Model.OrderItem;
-import java.awt.print.PrinterJob;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.sql.Time;
+import java.text.ParseException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JCheckBox;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
 
 /**
  *
@@ -28,12 +43,16 @@ public class FormTransaksi extends javax.swing.JFrame {
     private Connection conn;
     
     private List<Menu> dataMenu = new ArrayList<>();
+    private Integer IDUser = null;
     
     /**
      * Creates new form FormTransaksi
      */
     public FormTransaksi() {
         initComponents();
+        
+        UserInfo user = UserInfo.getInstance();
+        IDUser = user.getIDUser();
         
         conn = Helper.Database.OpenConnection();
         
@@ -70,10 +89,10 @@ public class FormTransaksi extends javax.swing.JFrame {
         btnLogout = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
         transaksi = new javax.swing.JPanel();
-        topPanel = new Component.Transaction.TopPanel();
+        topPanel = new ComponentUI.Transaction.TopPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        menuList = new Component.Transaction.MenuPanel();
-        leftPanel = new Component.Transaction.LeftPanel();
+        menuList = new ComponentUI.Transaction.MenuPanel();
+        leftPanel = new ComponentUI.Transaction.LeftPanel();
         riwayatTransaksi = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblRiwayatTransaksi = new javax.swing.JTable();
@@ -180,13 +199,13 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         tblRiwayatTransaksi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Tanggal", "Waktu", "ID Transaksi", "Jenis", "Harga"
+                "Tanggal", "Waktu", "ID Transaksi", "Nama Pelanggan", "No Telp Pelanggan", "Jenis", "Harga"
             }
         ));
         tblRiwayatTransaksi.setRowHeight(40);
@@ -213,8 +232,8 @@ public class FormTransaksi extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addComponent(jLabel69)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(48, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+                .addGap(48, 48, 48))
         );
 
         mainPanel.add(riwayatTransaksi, "card2");
@@ -299,9 +318,12 @@ public class FormTransaksi extends javax.swing.JFrame {
     }
 
     
-    public void submitTransaction(Map<Integer, OrderItem> orderItems, int totalPembayaran, int totalKembalian) {
+    public void submitTransaction(Map<Integer, OrderItem> orderItems, int totalPembayaran, int totalKembalian, Integer IDPelanggan, String namaPelanggan) {
         PreparedStatement stmt;
-        String idTransaksi = generateTransactionId(); // Get the new transaction ID
+        String IDTransaksi = generateTransactionId(); // Get the new transaction ID
+        double totalHarga = calculateTotalHarga(orderItems);
+        java.sql.Date tanggalTransaksi = new java.sql.Date(System.currentTimeMillis());
+        Time waktuTransaksi = new java.sql.Time(System.currentTimeMillis());
 
         try {
             conn.setAutoCommit(false);
@@ -310,15 +332,26 @@ public class FormTransaksi extends javax.swing.JFrame {
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             stmt = conn.prepareStatement(transaksiQuery, Statement.RETURN_GENERATED_KEYS);
 
-            stmt.setString(1, idTransaksi);
-            stmt.setNull(2, java.sql.Types.INTEGER);
-            stmt.setNull(3, java.sql.Types.INTEGER);
+            stmt.setString(1, IDTransaksi);
+            
+            if (IDUser == null) {
+                stmt.setNull(2, java.sql.Types.INTEGER);  // Handle as NULL in SQL
+            } else {
+                stmt.setInt(2, IDUser);  // Set actual value if it's not null
+            }
+            
+            if (IDPelanggan == null) {
+                stmt.setNull(3, java.sql.Types.INTEGER);  // Handle as NULL in SQL
+            } else {
+                stmt.setInt(3, IDPelanggan);  // Set actual value if it's not null
+            }
+            
             stmt.setString(4, "dine_in");
-            stmt.setDouble(5, calculateTotalHarga(orderItems));  // Sum of item prices
+            stmt.setDouble(5, totalHarga);  // Sum of item prices
             stmt.setDouble(6, totalPembayaran);
             stmt.setDouble(7, totalKembalian);
-            stmt.setDate(8, new java.sql.Date(System.currentTimeMillis()));  // Current date
-            stmt.setTime(9, new java.sql.Time(System.currentTimeMillis()));  // Current time
+            stmt.setDate(8, tanggalTransaksi);  // Current date
+            stmt.setTime(9, waktuTransaksi);  // Current time
             stmt.setString(10, "diproses");
 
             stmt.executeUpdate();
@@ -328,7 +361,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                 String detailQuery = "INSERT INTO detail_transaksi (id_transaksi, id_menu, kuantitas, harga_jual, subtotal, topping, level) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 stmt = conn.prepareStatement(detailQuery);
 
-                stmt.setString(1, idTransaksi);
+                stmt.setString(1, IDTransaksi);
                 stmt.setInt(2, item.getId());  // Assuming item.getId() corresponds to the menu ID
                 stmt.setInt(3, item.getKuantitas());
                 stmt.setDouble(4, item.getHarga());
@@ -391,11 +424,22 @@ public class FormTransaksi extends javax.swing.JFrame {
             
             conn.commit();
 
-            // Show confirmation message
-            JOptionPane.showMessageDialog(null,
-                    "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: Rp. " + totalPembayaran +
-                            "\nKembalian: Rp. " + totalKembalian,
-                    "Konfirmasi", JOptionPane.INFORMATION_MESSAGE);
+//            String[] buttonLabels = {"OK"};
+//
+//            // Create a new instance of CustomDialog without actions
+//            MessageDialog dialog = new MessageDialog(
+//                "Success",
+//                "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: Rp. " + totalPembayaran +
+//                            "\nKembalian: Rp. " + totalKembalian,
+//                buttonLabels,
+//                null // Pass null for default behavior (close dialog)
+//            );
+//
+//            // Show the dialog
+//            dialog.showDialog();
+            
+            Struk.saveAsPDF(IDTransaksi, tanggalTransaksi, waktuTransaksi, namaPelanggan, orderItems, totalHarga, totalPembayaran, totalKembalian);
+            
         } catch (SQLException e) {
             try {
                 conn.rollback();
@@ -432,13 +476,13 @@ public class FormTransaksi extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel69;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private Component.Transaction.LeftPanel leftPanel;
+    private ComponentUI.Transaction.LeftPanel leftPanel;
     private javax.swing.JPanel mainPanel;
-    private Component.Transaction.MenuPanel menuList;
+    private ComponentUI.Transaction.MenuPanel menuList;
     private javax.swing.JPanel menuPanel;
     private javax.swing.JPanel riwayatTransaksi;
     private javax.swing.JTable tblRiwayatTransaksi;
-    private Component.Transaction.TopPanel topPanel;
+    private ComponentUI.Transaction.TopPanel topPanel;
     private javax.swing.JPanel transaksi;
     // End of variables declaration//GEN-END:variables
 
@@ -466,12 +510,22 @@ public class FormTransaksi extends javax.swing.JFrame {
         model.addColumn("Tanggal");
         model.addColumn("Waktu");
         model.addColumn("ID Transaksi");
+        model.addColumn("Nama Kasir");
+        model.addColumn("Nama Pelanggan");
+        model.addColumn("No Telp Pelanggan");
         model.addColumn("Jenis");
         model.addColumn("Total Transaksi");
+        model.addColumn("Bayar");
+        model.addColumn("Kembali");
+        model.addColumn("Aksi");
 
         //Menampilkan data kedalam tabel
         try {
-            String query = "SELECT tanggal_transaksi, waktu_transaksi, id_transaksi, jenis_pesanan, total_harga FROM transaksi ORDER BY tanggal_transaksi DESC, waktu_transaksi DESC";
+            String query = "SELECT tanggal_transaksi, waktu_transaksi, id_transaksi, user.nama as nama_user, pelanggan.nama as nama_pelanggan, no_telp, jenis_pesanan, total_harga, total_pembayaran, kembalian"
+                    + " FROM transaksi"
+                    + " LEFT JOIN pelanggan ON transaksi.id_pelanggan = pelanggan.id_pelanggan"
+                    + " LEFT JOIN user ON transaksi.id_user = user.id_user"
+                    + " ORDER BY tanggal_transaksi DESC, waktu_transaksi DESC";
             Statement stm=conn.createStatement();
             ResultSet res=stm.executeQuery(query);
             while(res.next()){
@@ -479,11 +533,147 @@ public class FormTransaksi extends javax.swing.JFrame {
                     res.getString(1),
                     res.getString(2),
                     res.getString(3),
-                    res.getString(4).equals("dine_in") ? "Makan di tempat" : "Take Away",
-                    "Rp. " + String.valueOf((int) res.getFloat(5))
+                    res.getString(4) != null ? res.getString(4) : "-",
+                    res.getString(5) != null ? res.getString(5) : "-",
+                    res.getString(6) != null ? res.getString(6) : "-",
+                    res.getString(7).equals("dine_in") ? "Makan di tempat" : "Take Away",
+                    "Rp. " + String.valueOf((int) res.getFloat(8)),
+                    "Rp. " + String.valueOf((int) res.getFloat(9)),
+                    "Rp. " + String.valueOf((int) res.getFloat(10))
                 });
             }
+            
             tblRiwayatTransaksi.setModel(model);
-        }catch (Exception e) {}
+            
+            tblRiwayatTransaksi.getColumnModel().getColumn(10).setCellRenderer(new ButtonRenderer());
+            tblRiwayatTransaksi.getColumnModel().getColumn(10).setCellEditor(new ButtonEditor(new JCheckBox()));
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private Map<Integer, OrderItem> getOrderItemsForTransaction(String idTransaksi) {
+        Map<Integer, OrderItem> orderItems = new LinkedHashMap<>();
+        
+        try {
+            String query = "SELECT * FROM detail_transaksi"
+                    + " JOIN menu ON detail_transaksi.id_menu=menu.id_menu WHERE id_transaksi = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, idTransaksi);
+            ResultSet res = stmt.executeQuery();
+
+            while (res.next()) {
+                int idMenu = res.getInt("id_menu");
+                
+                OrderItem item = new OrderItem(
+                    idMenu,
+                    res.getString("nama_menu"),
+                    res.getInt("harga"),
+                    res.getString("jenis")
+                );
+                
+                item.setKuantitas(res.getInt("kuantitas"));
+                item.addTopping(res.getString("kuantitas"));
+                item.addLevel(res.getString("kuantitas"));
+                
+                orderItems.put(idMenu, item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return orderItems;
+    }
+    
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+            setMargin(new Insets(5, 10, 5, 10));
+            setPreferredSize(new Dimension(100, 30));
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setText("Cetak Struk");
+            return this;
+        }
+    }
+    
+    class ButtonEditor extends DefaultCellEditor {
+        private JButton button;
+        private String label;
+        private boolean isPushed;
+
+        public ButtonEditor(JCheckBox checkBox) {
+            super(checkBox);
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    fireEditingStopped();
+                }
+            });
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            label = "Cetak Struk";
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                // Remove row
+                DefaultTableModel model = (DefaultTableModel) tblRiwayatTransaksi.getModel();
+                int selectedRow = tblRiwayatTransaksi.getSelectedRow();
+                
+                if (selectedRow != -1) {
+                    // Get the values from the selected row
+                    String idTransaksi = model.getValueAt(selectedRow, 2).toString();
+                    String tanggalTransaksi = model.getValueAt(selectedRow, 0).toString();
+                    String waktuTransaksi = model.getValueAt(selectedRow, 1).toString();
+                    String namaPelanggan = model.getValueAt(selectedRow, 3).toString();
+                    double totalHarga = Double.parseDouble(model.getValueAt(selectedRow, 7).toString().replace("Rp. ", "").replace(",", ""));
+                    double totalPembayaran = Double.parseDouble(model.getValueAt(selectedRow, 8).toString().replace("Rp. ", "").replace(",", ""));
+                    double totalKembalian = Double.parseDouble(model.getValueAt(selectedRow, 9).toString().replace("Rp. ", "").replace(",", ""));
+                    
+                    // Parse Tanggal (Date) and Waktu (Time)
+                    Date parsedDate = new Date();
+                    Time parsedTime = Time.valueOf("00:00:00");  // Default time if parsing fails
+                    try {
+                        // Date parsing
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  // Adjust format if needed
+                        parsedDate = dateFormat.parse(tanggalTransaksi);
+                        
+                        // Time parsing
+                        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");  // Adjust format if needed
+                        LocalTime parsedLocalTime = LocalTime.parse(waktuTransaksi, timeFormat);
+                        parsedTime = Time.valueOf(parsedLocalTime);
+                    } catch (ParseException parseException) {
+                        parseException.printStackTrace();
+                    }
+                    // Assuming you have a method to get order items for the transaction
+                    Map<Integer, OrderItem> orderItems = getOrderItemsForTransaction(idTransaksi);
+                    // Generate the PDF with the retrieved data
+                    Struk.saveAsPDF(idTransaksi, parsedDate, parsedTime, namaPelanggan, orderItems, totalHarga, totalPembayaran, totalKembalian);
+                }
+            }
+            isPushed = false;
+            return label;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+
+        @Override
+        protected void fireEditingStopped() {
+            super.fireEditingStopped();
+        }
     }
 }

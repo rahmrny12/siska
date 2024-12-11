@@ -4,11 +4,13 @@
  */
 package View;
 
+import ComponentUI.Transaction.TopPanel;
 import Helper.KartuStok;
 import Helper.Struk;
 import Helper.UserInfo;
 import Model.Menu;
 import Model.OrderItem;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -31,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -60,7 +63,7 @@ public class FormTransaksi extends javax.swing.JFrame {
         
         leftPanel.setFormTransaksi(this);
         
-        loadDataMenu();
+        loadDataMenu("makanan");
         
         menuList.setMenuActionListener((int id) -> {
             Menu selectedMenu = null;
@@ -72,6 +75,19 @@ public class FormTransaksi extends javax.swing.JFrame {
             
             leftPanel.addOrderItem(selectedMenu.getId(), selectedMenu.getNamaMenu(), selectedMenu.getHarga(), selectedMenu.getJenis());
         });
+        
+        TopPanel topPanel = new TopPanel(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Mendapatkan teks tombol yang diklik (Makanan atau Minuman)
+                String filter = ((JButton) e.getSource()).getText();
+                // Panggil loadDataMenu dengan jenis filter yang sesuai
+                loadDataMenu(filter);
+            }
+        });
+
+        // mengatur layout
+        filterContainerPanel.add(topPanel, BorderLayout.NORTH);
     }
 
     /**
@@ -89,10 +105,11 @@ public class FormTransaksi extends javax.swing.JFrame {
         btnLogout = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
         transaksi = new javax.swing.JPanel();
-        topPanel = new ComponentUI.Transaction.TopPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        menuList = new ComponentUI.Transaction.MenuPanel();
         leftPanel = new ComponentUI.Transaction.LeftPanel();
+        menuContainerPanel = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        menuList = new ComponentUI.Transaction.MenuPanel();
+        filterContainerPanel = new javax.swing.JPanel();
         riwayatTransaksi = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblRiwayatTransaksi = new javax.swing.JTable();
@@ -161,36 +178,54 @@ public class FormTransaksi extends javax.swing.JFrame {
         mainPanel.setBackground(new java.awt.Color(144, 2, 2));
         mainPanel.setLayout(new java.awt.CardLayout());
 
-        jScrollPane1.setViewportView(menuList);
+        jScrollPane4.setViewportView(menuList);
+
+        javax.swing.GroupLayout menuContainerPanelLayout = new javax.swing.GroupLayout(menuContainerPanel);
+        menuContainerPanel.setLayout(menuContainerPanelLayout);
+        menuContainerPanelLayout.setHorizontalGroup(
+            menuContainerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(menuContainerPanelLayout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
+        );
+        menuContainerPanelLayout.setVerticalGroup(
+            menuContainerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, menuContainerPanelLayout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
+        );
+
+        filterContainerPanel.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout transaksiLayout = new javax.swing.GroupLayout(transaksi);
         transaksi.setLayout(transaksiLayout);
         transaksiLayout.setHorizontalGroup(
             transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 693, Short.MAX_VALUE)
-            .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(transaksiLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(leftPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(topPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1))
-                    .addContainerGap()))
+            .addGroup(transaksiLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(leftPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(filterContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(transaksiLayout.createSequentialGroup()
+                        .addComponent(menuContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, 0))))
         );
         transaksiLayout.setVerticalGroup(
             transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 427, Short.MAX_VALUE)
-            .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(transaksiLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(leftPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(transaksiLayout.createSequentialGroup()
-                            .addComponent(topPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)))
-                    .addContainerGap()))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, transaksiLayout.createSequentialGroup()
+                .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(transaksiLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(leftPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(transaksiLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(filterContainerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(menuContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         mainPanel.add(transaksi, "card2");
@@ -223,7 +258,7 @@ public class FormTransaksi extends javax.swing.JFrame {
             .addComponent(jLabel69, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(riwayatTransaksiLayout.createSequentialGroup()
                 .addGap(24, 24, 24)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 645, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 657, Short.MAX_VALUE)
                 .addGap(24, 24, 24))
         );
         riwayatTransaksiLayout.setVerticalGroup(
@@ -473,24 +508,32 @@ public class FormTransaksi extends javax.swing.JFrame {
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnToRiwayatTransaksi;
     private javax.swing.JButton btnToTransaksi;
+    private javax.swing.JPanel filterContainerPanel;
     private javax.swing.JLabel jLabel69;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane4;
     private ComponentUI.Transaction.LeftPanel leftPanel;
     private javax.swing.JPanel mainPanel;
+    private javax.swing.JPanel menuContainerPanel;
     private ComponentUI.Transaction.MenuPanel menuList;
     private javax.swing.JPanel menuPanel;
     private javax.swing.JPanel riwayatTransaksi;
     private javax.swing.JTable tblRiwayatTransaksi;
-    private ComponentUI.Transaction.TopPanel topPanel;
     private javax.swing.JPanel transaksi;
     // End of variables declaration//GEN-END:variables
 
-    private void loadDataMenu() {
+    private void loadDataMenu(String filter) {
         try {
-            String query = "SELECT * FROM menu";
-            Statement stmt = conn.createStatement();
-            ResultSet res = stmt.executeQuery(query);
+            String query = "SELECT * FROM menu WHERE jenis = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            // Set the value for the placeholder
+            stmt.setString(1, filter);
+
+            // Execute the query
+            ResultSet res = stmt.executeQuery();
+            
+            dataMenu.clear();
             
             while (res.next()) {
                 int idMenu = res.getInt("id_menu");
@@ -501,7 +544,10 @@ public class FormTransaksi extends javax.swing.JFrame {
                 dataMenu.add(new Menu(idMenu, namaMenu, harga, jenis));
             }
             
+            menuList.removeAll();
             menuList.setDataMenu(dataMenu);
+            menuList.revalidate();
+            menuList.repaint();
         } catch (Exception e) {}
     }
 

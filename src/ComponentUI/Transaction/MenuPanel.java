@@ -75,7 +75,7 @@ public class MenuPanel extends JPanel {
         JPanel card = new JPanel();
         card.setLayout(new GridLayout(0, 1, 10, 10)); // One column with gaps of 10px between items
         card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-
+        
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         menuPanel.setAlignmentX(Component.CENTER_ALIGNMENT);

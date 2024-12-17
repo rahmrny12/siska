@@ -57,6 +57,9 @@ public class FormTransaksi extends javax.swing.JFrame {
         UserInfo user = UserInfo.getInstance();
         IDUser = user.getIDUser();
         
+        lblUsername.setText(user.getUsername());
+        lblRole.setText(user.getRole());
+        
         conn = Helper.Database.OpenConnection();
         
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -103,6 +106,9 @@ public class FormTransaksi extends javax.swing.JFrame {
         btnToTransaksi = new javax.swing.JButton();
         btnToRiwayatTransaksi = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
+        panelUserProfile = new javax.swing.JPanel();
+        lblUsername = new javax.swing.JLabel();
+        lblRole = new javax.swing.JLabel();
         mainPanel = new javax.swing.JPanel();
         transaksi = new javax.swing.JPanel();
         leftPanel = new ComponentUI.Transaction.LeftPanel();
@@ -151,6 +157,36 @@ public class FormTransaksi extends javax.swing.JFrame {
             }
         });
 
+        panelUserProfile.setBackground(new java.awt.Color(255, 255, 255));
+
+        lblUsername.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblUsername.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsername.setText("Username");
+
+        lblRole.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblRole.setText("Role");
+
+        javax.swing.GroupLayout panelUserProfileLayout = new javax.swing.GroupLayout(panelUserProfile);
+        panelUserProfile.setLayout(panelUserProfileLayout);
+        panelUserProfileLayout.setHorizontalGroup(
+            panelUserProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelUserProfileLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelUserProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblUsername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblRole, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panelUserProfileLayout.setVerticalGroup(
+            panelUserProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelUserProfileLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblUsername)
+                .addGap(0, 0, 0)
+                .addComponent(lblRole)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout menuPanelLayout = new javax.swing.GroupLayout(menuPanel);
         menuPanel.setLayout(menuPanelLayout);
         menuPanelLayout.setHorizontalGroup(
@@ -161,18 +197,24 @@ public class FormTransaksi extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnToRiwayatTransaksi)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelUserProfile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnLogout)
                 .addContainerGap())
         );
         menuPanelLayout.setVerticalGroup(
             menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, menuPanelLayout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
+            .addGroup(menuPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnToTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnToRiwayatTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
+            .addGroup(menuPanelLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(panelUserProfile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         mainPanel.setBackground(new java.awt.Color(144, 2, 2));
@@ -186,7 +228,7 @@ public class FormTransaksi extends javax.swing.JFrame {
             menuContainerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(menuContainerPanelLayout.createSequentialGroup()
                 .addGap(0, 0, 0)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
                 .addGap(0, 0, 0))
         );
         menuContainerPanelLayout.setVerticalGroup(
@@ -205,13 +247,11 @@ public class FormTransaksi extends javax.swing.JFrame {
             transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(transaksiLayout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(leftPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(leftPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(filterContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(transaksiLayout.createSequentialGroup()
-                        .addComponent(menuContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(0, 0, 0))))
+                    .addComponent(menuContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         transaksiLayout.setVerticalGroup(
             transaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -459,19 +499,19 @@ public class FormTransaksi extends javax.swing.JFrame {
             
             conn.commit();
 
-//            String[] buttonLabels = {"OK"};
-//
-//            // Create a new instance of CustomDialog without actions
-//            MessageDialog dialog = new MessageDialog(
-//                "Success",
-//                "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: Rp. " + totalPembayaran +
-//                            "\nKembalian: Rp. " + totalKembalian,
-//                buttonLabels,
-//                null // Pass null for default behavior (close dialog)
-//            );
-//
-//            // Show the dialog
-//            dialog.showDialog();
+    //            String[] buttonLabels = {"OK"};
+    //
+    //            // Create a new instance of CustomDialog without actions
+    //            MessageDialog dialog = new MessageDialog(
+    //                "Success",
+    //                "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: Rp. " + totalPembayaran +
+    //                            "\nKembalian: Rp. " + totalKembalian,
+    //                buttonLabels,
+    //                null // Pass null for default behavior (close dialog)
+    //            );
+    //
+    //            // Show the dialog
+    //            dialog.showDialog();
             
             Struk.saveAsPDF(IDTransaksi, tanggalTransaksi, waktuTransaksi, namaPelanggan, orderItems, totalHarga, totalPembayaran, totalKembalian);
             
@@ -512,11 +552,14 @@ public class FormTransaksi extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel69;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JLabel lblRole;
+    private javax.swing.JLabel lblUsername;
     private ComponentUI.Transaction.LeftPanel leftPanel;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel menuContainerPanel;
     private ComponentUI.Transaction.MenuPanel menuList;
     private javax.swing.JPanel menuPanel;
+    private javax.swing.JPanel panelUserProfile;
     private javax.swing.JPanel riwayatTransaksi;
     private javax.swing.JTable tblRiwayatTransaksi;
     private javax.swing.JPanel transaksi;

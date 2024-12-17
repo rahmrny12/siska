@@ -8,6 +8,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  *
@@ -25,23 +28,24 @@ public class KartuStok {
                 int IDKartuStok = rs.getInt("id_kartu_stok");
                 int saldoSebelum = rs.getInt("saldo");
                 int jumlahKeluarLama = rs.getInt("jumlah_keluar");
+                Date tanggal = rs.getDate("tanggal");
                 String keteranganSebelum = rs.getString("keterangan");
                 
                 // Hitung saldo baru
                 int saldoBaru = saldoSebelum + jumlahMasuk - jumlahKeluar;
 
-                if (type.equals("transaksi") && keteranganSebelum.equals("Transaksi")) {
-                    String insertKartuStok = "UPDATE kartu_stok SET jumlah_keluar = ?, saldo = ?"
-                            + " WHERE id_kartu_stok = ?";
-
-                    try (PreparedStatement stmtUpdate = conn.prepareStatement(insertKartuStok)) {
-                        stmtUpdate.setInt(1, jumlahKeluarLama + jumlahKeluar);
-                        stmtUpdate.setInt(2, saldoBaru);
-                        stmtUpdate.setInt(3, IDKartuStok);
-
-                        stmtUpdate.executeUpdate();
-                    }
-                } else {
+//                if (type.equals("transaksi") && keteranganSebelum.equals("Transaksi")) {
+//                    String insertKartuStok = "UPDATE kartu_stok SET jumlah_keluar = ?, saldo = ?"
+//                            + " WHERE id_kartu_stok = ?";
+//
+//                    try (PreparedStatement stmtUpdate = conn.prepareStatement(insertKartuStok)) {
+//                        stmtUpdate.setInt(1, jumlahKeluarLama + jumlahKeluar);
+//                        stmtUpdate.setInt(2, saldoBaru);
+//                        stmtUpdate.setInt(3, IDKartuStok);
+//
+//                        stmtUpdate.executeUpdate();
+//                    }
+//                } else {
                     // Insert mutasi ke kartu stok
                     String insertKartuStok = "INSERT INTO kartu_stok (id_bahan, tanggal, keterangan, jumlah_masuk, jumlah_keluar, saldo) " +
                                              "VALUES (?, NOW(), ?, ?, ?, ?)";
@@ -55,7 +59,7 @@ public class KartuStok {
 
                         stmtInsert.executeUpdate();
                     }
-                }
+//                }
             }
         }
     }

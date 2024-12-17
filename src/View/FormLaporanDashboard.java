@@ -4,22 +4,29 @@
  */
 package View;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.DefaultCategoryDataset;
 import ComponentUI.BuatLaporan;
+import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.plot.PlotOrientation;
 
-public class FormLaporanOld extends javax.swing.JFrame {
+public class FormLaporanDashboard extends javax.swing.JFrame {
 
     private Connection conn;
     
     private HashMap<String, Object[]> dataStokBahan = new HashMap<>();
     
-    public FormLaporanOld() {
+    public FormLaporanDashboard() {
         initComponents();
         
         conn = Helper.Database.OpenConnection();
@@ -136,6 +143,10 @@ public class FormLaporanOld extends javax.swing.JFrame {
         txtJenisMenu2 = new javax.swing.JComboBox<>();
         txtJenisMenu3 = new javax.swing.JComboBox<>();
         btnBuatLaporan = new javax.swing.JButton();
+        Dashboard = new javax.swing.JPanel();
+        jLabel64 = new javax.swing.JLabel();
+        chartContainerPanel = new javax.swing.JPanel();
+        panelProduk = new javax.swing.JPanel();
         laporanStok = new javax.swing.JPanel();
         jLabel47 = new javax.swing.JLabel();
         jLabel50 = new javax.swing.JLabel();
@@ -408,6 +419,47 @@ public class FormLaporanOld extends javax.swing.JFrame {
         );
 
         mainPanel.add(riwayatTransaksi, "card2");
+
+        Dashboard.setBackground(new java.awt.Color(144, 2, 2));
+
+        jLabel64.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        jLabel64.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel64.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel64.setText("Dashboard");
+
+        chartContainerPanel.setLayout(new java.awt.BorderLayout());
+
+        panelProduk.setLayout(new java.awt.BorderLayout());
+
+        javax.swing.GroupLayout DashboardLayout = new javax.swing.GroupLayout(Dashboard);
+        Dashboard.setLayout(DashboardLayout);
+        DashboardLayout.setHorizontalGroup(
+            DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(DashboardLayout.createSequentialGroup()
+                .addGroup(DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(DashboardLayout.createSequentialGroup()
+                        .addGap(167, 167, 167)
+                        .addComponent(jLabel64, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(DashboardLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chartContainerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(panelProduk, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(146, Short.MAX_VALUE))
+        );
+        DashboardLayout.setVerticalGroup(
+            DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(DashboardLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel64, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(36, 36, 36)
+                .addGroup(DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(chartContainerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelProduk, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(347, Short.MAX_VALUE))
+        );
+
+        mainPanel.add(Dashboard, "card2");
 
         laporanStok.setBackground(new java.awt.Color(144, 2, 2));
 
@@ -941,9 +993,117 @@ public class FormLaporanOld extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnToMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToMenuActionPerformed
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+
+        mainPanel.add(Dashboard);
+        mainPanel.repaint();
+        mainPanel.revalidate();
         
+        loadDataProfit();
+        loadDataProduk();
     }//GEN-LAST:event_btnToMenuActionPerformed
 
+    private void loadDataProfit() {
+        // Membuat dataset untuk chart
+        DefaultCategoryDataset dataset = createDatasetProfit();
+        
+        // Membuat chart
+        JFreeChart chart = ChartFactory.createLineChart(
+                "Laba Bersih per Tanggal", // Judul chart
+                "Tanggal", // Label sumbu X
+                "Laba Bersih", // Label sumbu Y
+                dataset, // Dataset
+                PlotOrientation.VERTICAL, // Orientasi plot vertikal
+                true, // Menampilkan legend
+                true, // Menampilkan tooltips
+                false // Tidak menampilkan URL
+        );
+        
+        // Menambahkan chart ke dalam panel
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new java.awt.Dimension(600, 600));
+//        setContentPane(chartPanel);
+        chartContainerPanel.add(chartPanel, BorderLayout.CENTER);
+        chartContainerPanel.validate();
+    }
+
+    private DefaultCategoryDataset createDatasetProfit() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        // SQL query untuk mengambil data dari tabel laporan_laba
+        String sql = "SELECT tanggal_laporan, laba_bersih FROM laporan_laba ORDER BY tanggal_laporan";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            // Mengambil data dari hasil query dan menambahkannya ke dataset
+            while (rs.next()) {
+                String tanggal = rs.getString("tanggal_laporan");
+                int labaBersih = rs.getInt("laba_bersih");
+
+                // Menambahkan data ke dataset (Label untuk sumbu Y adalah "Laba Bersih" dan tanggal untuk sumbu X)
+                dataset.addValue(labaBersih, "Laba Bersih", tanggal);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dataset;
+    }
+    
+    private void loadDataProduk() {
+        // Membuat dataset untuk chart
+        DefaultCategoryDataset dataset = createDatasetProduk();
+        
+        // Membuat chart
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Produk Terjual Per Tanggal", // Judul chart
+                "Nama Menu", // Label sumbu X
+                "Jumlah Terjual", // Label sumbu Y
+                dataset, // Dataset
+                PlotOrientation.VERTICAL, // Orientasi plot vertikal
+                true, // Menampilkan legend
+                true, // Menampilkan tooltips
+                false // Tidak menampilkan URL
+        );
+        
+        // Menambahkan chart ke dalam panel
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new java.awt.Dimension(600, 600));
+//        setContentPane(chartPanel);
+        panelProduk.add(chartPanel, BorderLayout.CENTER);
+        panelProduk.validate();
+    }
+
+    private DefaultCategoryDataset createDatasetProduk() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        // SQL query untuk mengambil data dari tabel laporan_laba
+        String sql = "SELECT transaksi.tanggal_transaksi, menu.nama_menu, SUM(detail_transaksi.kuantitas) AS total FROM transaksi INNER JOIN detail_transaksi ON transaksi.id_transaksi=detail_transaksi.id_transaksi INNER JOIN menu ON detail_transaksi.id_menu = menu.id_menu group BY menu.id_menu order by total DESC";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            // Mengambil data dari hasil query dan menambahkannya ke dataset
+            while (rs.next()) {
+                String nama_menu = rs.getString("nama_menu");
+                int kuantitas = rs.getInt ("total");
+
+                // Menambahkan data ke dataset (Label untuk sumbu Y adalah "Laba Bersih" dan tanggal untuk sumbu X)
+                dataset.addValue(kuantitas, "nama_menu", nama_menu);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dataset;
+    }
+
+    
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         dispose(); // this will close current login box window
 
@@ -1250,6 +1410,7 @@ public class FormLaporanOld extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel Dashboard;
     private javax.swing.JPanel bodyPanel;
     private javax.swing.JButton btnBuatLaporan;
     private javax.swing.JButton btnEkspor;
@@ -1262,6 +1423,7 @@ public class FormLaporanOld extends javax.swing.JFrame {
     private javax.swing.JButton btnToRiwayatTransaksi;
     private javax.swing.JComboBox<String> cbBulan;
     private javax.swing.JComboBox<String> cbTahun;
+    private javax.swing.JPanel chartContainerPanel;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
     private javax.swing.JLabel jLabel45;
@@ -1281,6 +1443,7 @@ public class FormLaporanOld extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel59;
     private javax.swing.JLabel jLabel60;
     private javax.swing.JLabel jLabel61;
+    private javax.swing.JLabel jLabel64;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -1295,6 +1458,7 @@ public class FormLaporanOld extends javax.swing.JFrame {
     private javax.swing.JPanel laporanStokMasuk;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel menuPanel;
+    private javax.swing.JPanel panelProduk;
     private javax.swing.JPanel riwayatTransaksi;
     private javax.swing.JTable tblKartuStok;
     private javax.swing.JTable tblLaporanLaba;
@@ -1314,4 +1478,47 @@ public class FormLaporanOld extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> txtJenisMenu9;
     private javax.swing.JComboBox<String> txtPilihBahan;
     // End of variables declaration//GEN-END:variables
+
+    private void loadDashboard() {
+        try {
+            // Ambil data dari database
+            String query = "SELECT tanggal_laporan,laba_bersih FROM laporan_laba";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            // Membuat dataset untuk grafik
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+            while (rs.next()) {
+                String tanggal_laporan = rs.getString("tanggal_laporan");
+                int laba_bersih = rs.getInt("laba_bersih");
+                dataset.addValue(laba_bersih, "laba_bersih", String.valueOf(tanggal_laporan));
+            }
+
+            // Membuat grafik garis
+            JFreeChart lineChart = ChartFactory.createLineChart(
+                    "Grafik Garis dari Database", // Judul
+                    "Tanggal",                     // Label sumbu X
+                    "Profit",                     // Label sumbu Y
+                    dataset,                     // Dataset
+                    org.jfree.chart.plot.PlotOrientation.VERTICAL, // Orientasi
+                    true,                        // Legenda
+                    true,                        // Tooltips
+                    false                        // URLs
+            );
+
+            // Menampilkan grafik di dalam JFrame
+            ChartPanel chartPanel = new ChartPanel(lineChart);
+            JFrame frame = new JFrame("Grafik Garis dari Database");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(800, 600);
+            frame.add(chartPanel);
+            frame.setVisible(true);
+            
+            
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

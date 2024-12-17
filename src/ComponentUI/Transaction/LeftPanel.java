@@ -40,14 +40,17 @@ public class LeftPanel extends JPanel {
         conn = Helper.Database.OpenConnection();
         
         dataTopping.put("None", 0);
-        dataTopping.put("Dumpling", 1000);
-        dataTopping.put("Telur", 3000);
-        dataTopping.put("Cuanki", 2000);
+        dataTopping.put("Dumpling - Rp. 1000", 1000);
+        dataTopping.put("Telur - Rp. 3000", 3000);
+        dataTopping.put("Cuanki - Rp. 2000", 2000);
         
         dataLevel.put("None", 0);
-        dataLevel.put("Level 1", 1000);
-        dataLevel.put("Level 2", 2000);
-        dataLevel.put("Level 3", 3000);
+        dataLevel.put("Level 1", 0);
+        dataLevel.put("Level 2", 0);
+        dataLevel.put("Level 3", 0);
+        dataLevel.put("Level 4", 1000);
+        dataLevel.put("Level 5", 1000);
+        dataLevel.put("Level 6", 1000);
         
         orderSummaryPanel = new JPanel();
         orderSummaryPanel.setLayout(new BoxLayout(orderSummaryPanel, BoxLayout.Y_AXIS)); // Vertical layout
@@ -226,7 +229,7 @@ public class LeftPanel extends JPanel {
             firstPanel.add(Box.createHorizontalGlue());
 
             JLabel quantityLabel = new JLabel(item.getKuantitas() + "x");
-            quantityLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            quantityLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
             firstPanel.add(quantityLabel);
             
             orderItemPanel.add(firstPanel);
@@ -274,8 +277,32 @@ public class LeftPanel extends JPanel {
                     }
                 });
                 secondPanel.add(levelComboBox);
+                
+                secondPanel.add(Box.createHorizontalGlue());
 
                 orderItemPanel.add(secondPanel);
+            }
+            
+            try {
+                ImageIcon removeIcon = new ImageIcon(getClass().getResource("/Media/Close.png"));
+                JButton removeButton = new JButton(removeIcon);
+                removeButton.setContentAreaFilled(false); // Make button background transparent
+                removeButton.setBorderPainted(false); // Remove button border
+                removeButton.setFocusPainted(false); // Remove focus border
+                removeButton.setPreferredSize(new Dimension(14, 14));
+                removeButton.addActionListener(e -> {
+                    // Handle delete action
+                    orderItems.remove(item.getId()); // Remove item from the list
+                    orderSummaryPanel.remove(orderItemPanel); // Remove panel from UI
+                    orderSummaryPanel.revalidate();
+                    orderSummaryPanel.repaint();
+                    updateTotal(); // Update the total price or quantities
+                });
+
+                firstPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+                firstPanel.add(removeButton); // Add trash button to the panel
+            } catch (Exception e) {
+                System.err.println("Error loading trash icon: " + e.getMessage());
             }
             
             // Add a divider
@@ -304,11 +331,10 @@ public class LeftPanel extends JPanel {
             }
             
             for (String level : item.getLevels()) {
-            if (dataLevel.containsKey(level)) {
-                totalHarga += dataLevel.get(level);
+                if (dataLevel.containsKey(level)) {
+                    totalHarga += dataLevel.get(level);
+                }
             }
-        }
-
         }
 
         totalLabel.setText("Total: Rp. " + totalHarga);

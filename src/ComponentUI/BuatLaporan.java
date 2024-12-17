@@ -47,8 +47,6 @@ public class BuatLaporan extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtDeskripsiPengeluaran = new javax.swing.JTextField();
-        txtTanggal = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -74,10 +72,6 @@ public class BuatLaporan extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Deskripsi Pengeluaran");
 
-        jLabel3.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Tanggal");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -91,12 +85,10 @@ public class BuatLaporan extends javax.swing.JFrame {
                             .addComponent(txtTotalPengeluaran)
                             .addComponent(btnSubmit, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                             .addComponent(txtDeskripsiPengeluaran)
-                            .addComponent(txtTanggal)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel1)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3))
+                                    .addComponent(jLabel2))
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())))
         );
@@ -113,11 +105,7 @@ public class BuatLaporan extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDeskripsiPengeluaran, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtTanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                 .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -139,27 +127,27 @@ public class BuatLaporan extends javax.swing.JFrame {
     private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
         int totalPengeluaran = Integer.parseInt(txtTotalPengeluaran.getText());
         String deskripsiPengeluaran =(txtDeskripsiPengeluaran.getText());
-        
+
         PreparedStatement stmt;
-        
+
         try {
             // Membuat query mysql
             String query = "INSERT INTO `laporan_pengeluaran`(`id_user`, `tanggal_laporan`, `deskripsi_pengeluaran`, `total_pengeluaran`) VALUES (?,?,?,?)";
             stmt = conn.prepareStatement(query);
-            
+
             java.sql.Date nowDate = new java.sql.Date(System.currentTimeMillis());
-            
+
             if (IDUser == null) {
                 stmt.setNull(1, java.sql.Types.INTEGER);  // Handle as NULL in SQL
             } else {
                 stmt.setInt(1, IDUser);  // Set actual value if it's not null
             }
-            
+
             stmt.setDate(2, nowDate);
             stmt.setString(3, deskripsiPengeluaran);
             stmt.setInt(4, totalPengeluaran);
             stmt.execute();
-            
+
             // First, calculate total pendapatan from transaksi table
             String queryPendapatan = "SELECT SUM(total_harga) as total_pendapatan FROM transaksi WHERE tanggal_transaksi = ?";
             stmt = conn.prepareStatement(queryPendapatan);
@@ -169,9 +157,22 @@ public class BuatLaporan extends javax.swing.JFrame {
             if (rsPendapatan.next()) {
                 totalPendapatan = rsPendapatan.getInt("total_pendapatan");
             }
-            
+
             if (totalPendapatan == 0) {
-                System.out.println("Belum ada transaksi hari ini.");
+                dispose();
+                
+                String[] buttonLabels = {"OK"};
+
+                // Create a new instance of CustomDialog without actions
+                MessageDialog dialog = new MessageDialog(
+                    "Error",
+                    "Belum ada transaksi hari ini.",
+                    buttonLabels,
+                    null // Pass null for default behavior (close dialog)
+                );
+
+                // Show the dialog
+                dialog.showDialog();
                 return;
             }
 
@@ -185,19 +186,30 @@ public class BuatLaporan extends javax.swing.JFrame {
             stmt.setInt(2, totalPendapatan);
             stmt.setInt(3, totalPengeluaran);
             stmt.setInt(4, labaBersih);
-            
+
             if (IDUser == null) {
                 stmt.setNull(5, java.sql.Types.INTEGER);  // Handle as NULL in SQL
             } else {
                 stmt.setInt(5, IDUser);  // Set actual value if it's not null
             }
-            
+
             stmt.execute();
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal menambahkan data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Error",
+                "Gagal menambahkan data. " + e.getMessage(),
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
         }
-        
+
     }//GEN-LAST:event_btnSubmitActionPerformed
 
     /**
@@ -246,11 +258,9 @@ public class BuatLaporan extends javax.swing.JFrame {
     private javax.swing.JButton btnSubmit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel48;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField txtDeskripsiPengeluaran;
-    private javax.swing.JTextField txtTanggal;
     private javax.swing.JTextField txtTotalPengeluaran;
     // End of variables declaration//GEN-END:variables
 }

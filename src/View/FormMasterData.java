@@ -2277,7 +2277,7 @@ public class FormMasterData extends javax.swing.JFrame {
         // Create a new instance of CustomDialog without actions
         MessageDialog dialog = new MessageDialog(
             "Konfirmasi Hapus",
-            "Apakah Anda yakin ingin menghapus Bahan tersebut?",
+            "Apakah Anda yakin ingin menghapus Data tersebut?",
             buttonLabels,
             new ActionListener[]{yesAction, noAction}
         );

@@ -48,6 +48,7 @@ public class FormLogin extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        Sembunyikanpass = new javax.swing.JCheckBox();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -99,6 +100,14 @@ public class FormLogin extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Username");
 
+        Sembunyikanpass.setForeground(new java.awt.Color(255, 255, 255));
+        Sembunyikanpass.setText("Show Password");
+        Sembunyikanpass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SembunyikanpassActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -118,8 +127,13 @@ public class FormLogin extends javax.swing.JFrame {
                             .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE))
                         .addContainerGap(313, Short.MAX_VALUE))))
             .addGroup(mainPanelLayout.createSequentialGroup()
-                .addGap(294, 294, 294)
-                .addComponent(jLabel2)
+                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(mainPanelLayout.createSequentialGroup()
+                        .addGap(294, 294, 294)
+                        .addComponent(jLabel2))
+                    .addGroup(mainPanelLayout.createSequentialGroup()
+                        .addGap(326, 326, 326)
+                        .addComponent(Sembunyikanpass, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
@@ -135,9 +149,11 @@ public class FormLogin extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addComponent(Sembunyikanpass)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addGap(38, 38, 38))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -171,6 +187,15 @@ public class FormLogin extends javax.swing.JFrame {
     private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtUsernameActionPerformed
+
+    private void SembunyikanpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SembunyikanpassActionPerformed
+              if (Sembunyikanpass.isSelected()){
+          txtPassword.setEchoChar((char)0);
+      }
+      else {
+          txtPassword.setEchoChar('*');
+      }
+    }//GEN-LAST:event_SembunyikanpassActionPerformed
 
     private boolean authenticate(String username, String password) {
         PreparedStatement stmt = null;
@@ -262,6 +287,7 @@ public class FormLogin extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox Sembunyikanpass;
     private javax.swing.JButton btnSubmit;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;

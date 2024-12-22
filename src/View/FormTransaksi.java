@@ -4,12 +4,15 @@
  */
 package View;
 
+import ComponentUI.MessageDialog;
 import ComponentUI.Transaction.TopPanel;
 import Helper.KartuStok;
 import Helper.Struk;
 import Helper.UserInfo;
+import Model.BahanMenu;
 import Model.Menu;
 import Model.OrderItem;
+import Model.Topping;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -72,6 +75,33 @@ public class FormTransaksi extends javax.swing.JFrame {
             Menu selectedMenu = null;
             for (Menu menu : dataMenu) {
                 if (menu.getId() == id) {
+                    ArrayList<String> listBahanKurang = new ArrayList<>();
+                    
+                    for (BahanMenu bahan : menu.getListBahan()) {
+                        if (bahan.getStokSaatIni() < bahan.getStokDibutuhkan()) {
+                            listBahanKurang.add(bahan.getNamaBahan());
+                        }
+                    }
+                    
+                    String bahanKurang = String.join(", ", listBahanKurang);
+                    
+                    if (!bahanKurang.isEmpty()) {
+                        String[] buttonLabels = {"OK"};
+
+                        // Create a new instance of CustomDialog without actions
+                        MessageDialog dialog = new MessageDialog(
+                            "Success",
+                            "Bahan berikut tidak mencukupi: \n" + bahanKurang,
+                            buttonLabels,
+                            null // Pass null for default behavior (close dialog)
+                        );
+
+                        // Show the dialog
+                        dialog.showDialog();
+                        
+                        return;
+                    }
+                    
                     selectedMenu = menu;
                 }
             }
@@ -393,7 +423,7 @@ public class FormTransaksi extends javax.swing.JFrame {
     }
 
     
-    public void submitTransaction(Map<Integer, OrderItem> orderItems, int totalPembayaran, int totalKembalian, Integer IDPelanggan, String namaPelanggan) {
+    public void submitTransaction(List<OrderItem> orderItems, int totalPembayaran, int totalKembalian, Integer IDPelanggan, String namaPelanggan) {
         PreparedStatement stmt;
         String IDTransaksi = generateTransactionId(); // Get the new transaction ID
         double totalHarga = calculateTotalHarga(orderItems);
@@ -432,8 +462,8 @@ public class FormTransaksi extends javax.swing.JFrame {
             stmt.executeUpdate();
 
             // Step 2: Insert into 'detail_transaksi' table
-            for (OrderItem item : orderItems.values()) {
-                String detailQuery = "INSERT INTO detail_transaksi (id_transaksi, id_menu, kuantitas, harga_jual, subtotal, topping, level) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            for (OrderItem item : orderItems) {
+                String detailQuery = "INSERT INTO detail_transaksi (id_transaksi, id_menu, kuantitas, harga_jual, subtotal, topping, harga_topping, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 stmt = conn.prepareStatement(detailQuery);
 
                 stmt.setString(1, IDTransaksi);
@@ -442,14 +472,27 @@ public class FormTransaksi extends javax.swing.JFrame {
                 stmt.setDouble(4, item.getHarga());
                 stmt.setDouble(5, item.getHarga() * item.getKuantitas());
                 
-                String toppingString = String.join(",", item.getToppings());
+                List<Topping> toppings = item.getToppings();
+                String toppingString = toppings.stream()
+                        .map(topping -> topping.getNamaTopping()+ " x" + topping.getJumlahTopping()) // Format each topping
+                        .collect(java.util.stream.Collectors.joining(", ")); // Join them with a comma
+                item.addStringTopping(toppingString);
+                
                 stmt.setString(6, toppingString);
                 
+                // Hitung total harga topping
+                int totalHargaTopping = toppings.stream()
+                        .mapToInt(topping -> topping.getHargaTopping() * topping.getJumlahTopping()) // Kalikan harga per topping dengan jumlahnya
+                        .sum(); // Total harga semua topping
+                stmt.setInt(7, totalHargaTopping);
+                item.addTotalHargaToppings(totalHargaTopping);
+                
                 String levelString = String.join(",", item.getLevels());
-                stmt.setString(7, levelString);
+                stmt.setString(8, levelString);
 
                 stmt.executeUpdate();
                 
+                // update stok bahan menu
                 String fetchBahanQuery = "SELECT bm.id_bahan, b.nama_bahan, bm.jumlah_bahan " +
                          "FROM bahan_menu bm " +
                          "INNER JOIN bahan b ON bm.id_bahan = b.id_bahan " +
@@ -499,19 +542,19 @@ public class FormTransaksi extends javax.swing.JFrame {
             
             conn.commit();
 
-    //            String[] buttonLabels = {"OK"};
-    //
-    //            // Create a new instance of CustomDialog without actions
-    //            MessageDialog dialog = new MessageDialog(
-    //                "Success",
-    //                "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: Rp. " + totalPembayaran +
-    //                            "\nKembalian: Rp. " + totalKembalian,
-    //                buttonLabels,
-    //                null // Pass null for default behavior (close dialog)
-    //            );
-    //
-    //            // Show the dialog
-    //            dialog.showDialog();
+            String[] buttonLabels = {"OK"};
+
+            // Create a new instance of CustomDialog without actions
+            MessageDialog dialog = new MessageDialog(
+                "Success",
+                "Pembayaran Berhasil dari transaksi!\nTotal Pembayaran: Rp. " + totalPembayaran +
+                            "\nKembalian: Rp. " + totalKembalian,
+                buttonLabels,
+                null // Pass null for default behavior (close dialog)
+            );
+
+            // Show the dialog
+            dialog.showDialog();
             
             Struk.saveAsPDF(IDTransaksi, tanggalTransaksi, waktuTransaksi, namaPelanggan, orderItems, totalHarga, totalPembayaran, totalKembalian);
             
@@ -520,13 +563,13 @@ public class FormTransaksi extends javax.swing.JFrame {
                 conn.rollback();
             } catch (SQLException ex) {}
             
-            JOptionPane.showMessageDialog(null, "Gagal mengedit data. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Gagal menambahkan transaksi. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
-    private double calculateTotalHarga(Map<Integer, OrderItem> orderItems) {
+    private double calculateTotalHarga(List<OrderItem> orderItems) {
         double totalHarga = 0;
-        for (OrderItem item : orderItems.values()) {
+        for (OrderItem item : orderItems) {
             totalHarga += item.getHarga() * item.getKuantitas();
         }
         return totalHarga;
@@ -567,7 +610,11 @@ public class FormTransaksi extends javax.swing.JFrame {
 
     private void loadDataMenu(String filter) {
         try {
-            String query = "SELECT * FROM menu WHERE jenis = ?";
+            String query = "SELECT m.id_menu, m.nama_menu, m.harga, m.jenis, b.nama_bahan, b.stok_bahan, bm.jumlah_bahan " +
+                       "FROM menu m " +
+                       "LEFT JOIN bahan_menu bm ON m.id_menu = bm.id_menu " +
+                       "LEFT JOIN bahan b ON bm.id_bahan = b.id_bahan " +
+                       "WHERE m.jenis = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
 
             // Set the value for the placeholder
@@ -577,15 +624,32 @@ public class FormTransaksi extends javax.swing.JFrame {
             ResultSet res = stmt.executeQuery();
             
             dataMenu.clear();
+            Map<Integer, Menu> menuMap = new LinkedHashMap<>();
             
             while (res.next()) {
                 int idMenu = res.getInt("id_menu");
                 String namaMenu = res.getString("nama_menu");
                 double harga = res.getDouble("harga");
                 String jenis = res.getString("jenis");
+                String namaBahan = res.getString("nama_bahan");
+                int stokSaatIni = res.getInt("stok_bahan");
+                int stokDibutuhkan = res.getInt("jumlah_bahan");
 
-                dataMenu.add(new Menu(idMenu, namaMenu, harga, jenis));
+                if (!menuMap.containsKey(idMenu)) {                  
+
+                // Jika belum ada, tambahkan menu baru
+                    Menu newMenu = new Menu(idMenu, namaMenu, harga, jenis);
+                    menuMap.put(idMenu, newMenu);
+                }
+                
+                if (namaBahan != null) {
+                    BahanMenu bahan = new BahanMenu(namaBahan, stokSaatIni, stokDibutuhkan);
+                    Menu existingMenu = menuMap.get(idMenu);
+                    existingMenu.getListBahan().add(bahan);
+                }
             }
+            
+            dataMenu.addAll(menuMap.values());
             
             menuList.removeAll();
             menuList.setDataMenu(dataMenu);
@@ -641,8 +705,8 @@ public class FormTransaksi extends javax.swing.JFrame {
         }
     }
     
-    private Map<Integer, OrderItem> getOrderItemsForTransaction(String idTransaksi) {
-        Map<Integer, OrderItem> orderItems = new LinkedHashMap<>();
+    private List<OrderItem> getOrderItemsForTransaction(String idTransaksi) {
+        List<OrderItem> orderItems = new ArrayList<>();
         
         try {
             String query = "SELECT * FROM detail_transaksi"
@@ -662,10 +726,11 @@ public class FormTransaksi extends javax.swing.JFrame {
                 );
                 
                 item.setKuantitas(res.getInt("kuantitas"));
-                item.addTopping(res.getString("kuantitas"));
-                item.addLevel(res.getString("kuantitas"));
+                item.addStringTopping(res.getString("topping"));
+                item.addTotalHargaToppings(res.getInt("harga_topping"));
+                item.addLevel(res.getString("level"));
                 
-                orderItems.put(idMenu, item);
+                orderItems.add(item);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -745,7 +810,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                         parseException.printStackTrace();
                     }
                     // Assuming you have a method to get order items for the transaction
-                    Map<Integer, OrderItem> orderItems = getOrderItemsForTransaction(idTransaksi);
+                    List<OrderItem> orderItems = getOrderItemsForTransaction(idTransaksi);
                     // Generate the PDF with the retrieved data
                     Struk.saveAsPDF(idTransaksi, parsedDate, parsedTime, namaPelanggan, orderItems, totalHarga, totalPembayaran, totalKembalian);
                 }

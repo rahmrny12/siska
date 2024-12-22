@@ -1,5 +1,6 @@
 package ComponentUI.Transaction;
 
+import Model.BahanMenu;
 import java.sql.*;
 import javax.swing.*;
 import java.awt.*;
@@ -30,8 +31,9 @@ public class MenuPanel extends JPanel {
             String nama = menuItem.getNamaMenu();
             int harga = (int) menuItem.getHarga();
             String jenis = menuItem.getJenis();
+            List<BahanMenu> bahan = menuItem.getListBahan();
 
-            add(createMenuCard(id, nama, harga, jenis));
+            add(createMenuCard(id, nama, harga, jenis, bahan));
         }
         
         add(new JLabel());
@@ -71,7 +73,7 @@ public class MenuPanel extends JPanel {
         totalLabel.setHorizontalAlignment(SwingConstants.RIGHT);
     }
     
-    private JPanel createMenuCard(int id, String nama, int harga, String jenis) {
+    private JPanel createMenuCard(int id, String nama, int harga, String jenis, List<BahanMenu> listBahan) {
         JPanel card = new JPanel();
         card.setLayout(new GridLayout(0, 1, 10, 10)); // One column with gaps of 10px between items
         card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
@@ -84,14 +86,30 @@ public class MenuPanel extends JPanel {
         nameLabel.setFont(new Font("Arial", Font.BOLD, 20));
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        menuPanel.add(nameLabel);
 
         JLabel priceLabel = new JLabel("Rp. " + harga);
         priceLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        menuPanel.add(nameLabel);
         menuPanel.add(priceLabel);
+        
+        for (BahanMenu bahan : listBahan) {
+            if (bahan.getStokSaatIni() < bahan.getStokDibutuhkan()) {
+                String bahanText = bahan.getNamaBahan() + " (tersedia: " + bahan.getStokSaatIni() + ", butuh: " + bahan.getStokDibutuhkan() + ")";
+                JLabel bahanLabel = new JLabel(bahanText);
+                bahanLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+                bahanLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                bahanLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                // Menambahkan label bahan ke panel
+                menuPanel.add(bahanLabel);
+                menuPanel.setBackground(Color.PINK);
+                card.setBackground(Color.PINK);
+            }
+        }
 
         JButton addButton = new JButton("Tambah");
         addButton.addActionListener(e -> {

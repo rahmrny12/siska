@@ -175,23 +175,39 @@ public class BuatLaporan extends javax.swing.JFrame {
                 dialog.showDialog();
                 return;
             }
+            
+            String queryTotalPerTanggal = "SELECT total_pengeluaran FROM total_per_tanggal WHERE tanggal_laporan = ?";
+            stmt = conn.prepareStatement(queryTotalPerTanggal);
+            stmt.setDate(1, nowDate);  // Set the variable tanggalTransaksi as a parameter
+            ResultSet rsTotalPerTanggal = stmt.executeQuery();
+            if (rsTotalPerTanggal.next()) {
+                totalPengeluaran = rsTotalPerTanggal.getInt("total_pengeluaran");
+            }
 
             // Calculate laba bersih
             int labaBersih = totalPendapatan - totalPengeluaran;
 
             // Insert the data into laporan_laba
-            String queryLaba = "INSERT INTO laporan_laba (tanggal_laporan, total_pendapatan, total_pengeluaran, laba_bersih, id_user) VALUES (?, ?, ?, ?, ?)";
+            String queryLaba = "INSERT INTO laporan_laba (tanggal_laporan, total_pendapatan, total_pengeluaran, laba_bersih, id_user) " +
+                   "VALUES (?, ?, ?, ?, ?) " +
+                   "ON DUPLICATE KEY UPDATE " +
+                   "total_pendapatan = ?, " +
+                   "total_pengeluaran = ?, " +
+                   "laba_bersih = ?";
+                   
             stmt = conn.prepareStatement(queryLaba);
             stmt.setDate(1, nowDate);  // Use the same date for laporan_laba
             stmt.setInt(2, totalPendapatan);
             stmt.setInt(3, totalPengeluaran);
             stmt.setInt(4, labaBersih);
-
             if (IDUser == null) {
                 stmt.setNull(5, java.sql.Types.INTEGER);  // Handle as NULL in SQL
             } else {
                 stmt.setInt(5, IDUser);  // Set actual value if it's not null
             }
+            stmt.setInt(6, totalPendapatan);
+            stmt.setInt(7, totalPengeluaran);
+            stmt.setInt(8, labaBersih);
 
             stmt.execute();
 

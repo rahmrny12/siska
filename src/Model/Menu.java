@@ -4,6 +4,9 @@
  */
 package Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author LENOVO
@@ -13,12 +16,14 @@ public class Menu {
     private String namaMenu;
     private double harga;
     private String jenis;
+    private List<BahanMenu> listBahan;
 
     public Menu(int id, String namaMenu, double harga, String jenis) {
         this.id = id;
         this.namaMenu = namaMenu;
         this.harga = harga;
         this.jenis = jenis;
+        this.listBahan = new ArrayList<>();
     }
 
     public int getId() {
@@ -35,5 +40,9 @@ public class Menu {
     
     public String getJenis() {
         return jenis;
+    }
+    
+    public List<BahanMenu> getListBahan() {
+        return listBahan;
     }
 }

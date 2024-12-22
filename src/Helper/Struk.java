@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,11 +31,42 @@ import javax.swing.ImageIcon;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.sql.Time;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 
 public class Struk {
 
     private static final HashMap<Integer, OrderItem> orderItems = new HashMap<>();
+    
+    static Map<String, Integer> dataTopping = new LinkedHashMap<>();
+    static Map<String, Integer> dataLevel = new LinkedHashMap<>();
+    
+    static {
+        // Initialize dataTopping in a static block
+        dataTopping.put("None", 0);
+        dataTopping.put("Dumpling - Rp. 1000", 1000);
+        dataTopping.put("Telur - Rp. 3000", 3000);
+        dataTopping.put("Cuanki - Rp. 2000", 2000);
+    }
+    
+    static {
+        // Initialize dataTopping in a static block
+        dataLevel.put("None", 0);
+        dataLevel.put("Level 1", 0);
+        dataLevel.put("Level 2", 0);
+        dataLevel.put("Level 3", 0);
+        dataLevel.put("Level 4", 1000);
+        dataLevel.put("Level 5", 1000);
+        dataLevel.put("Level 6", 1000);
+    }
+
+    
+//    public Struk() {
+//        dataTopping.put("None", 0);
+//        dataTopping.put("Dumpling - Rp. 1000", 1000);
+//        dataTopping.put("Telur - Rp. 3000", 3000);
+//        dataTopping.put("Cuanki - Rp. 2000", 2000);
+//    }
 
     public static String formatTanggalTransaksi(Date tanggalTransaksi) {
         // Define the Indonesian locale
@@ -124,7 +156,7 @@ public class Struk {
     }
 
     // New method: Save receipt as PDF
-    public static void saveAsPDF(String IDTransaksi, Date tanggalTransaksi, Time waktuTransaksi, String namaPelanggan, Map<Integer, OrderItem> orderItems, double totalHarga, double totalPembayaran, double totalKembalian) {
+    public static void saveAsPDF(String IDTransaksi, Date tanggalTransaksi, Time waktuTransaksi, String namaPelanggan, List<OrderItem> orderItems, double totalHarga, double totalPembayaran, double totalKembalian) {
         String outputPath = "D:\\struk-" + IDTransaksi + ".pdf"; // Change path as needed
         String restaurantName = " Seblak Mang Ujang ", address = "Jl. Sumatera 104 (Sebrang KPRI, samping Masjid At-Taqwa)";
         
@@ -159,14 +191,39 @@ public class Struk {
             int currentPageHeight = 0;  // To track the height of the page content
             int maxPageHeight = 700;    // Max height for content before starting a new page (this will vary depending on the font size)
 
-            for (Map.Entry<Integer, OrderItem> entry : orderItems.entrySet()) {
-                OrderItem item = entry.getValue();
-                String itemLine = String.format("%d x %s @ %.2f", 
-                    item.getKuantitas(), 
-                    truncateText(item.getNama(), 15), // Truncate long names
-                    item.getHarga());
-                String totalLine = String.format("     Total: %.2f", 
-                    item.getKuantitas() * item.getHarga());
+            for (OrderItem item : orderItems) {
+                String toppings = item.getStringTopping();
+                toppings = toppings.equals("") ? "-" : toppings;
+                
+                int hargaTopping = 0;
+                hargaTopping = item.getTotalHargaToppings();
+                totalHarga += hargaTopping;
+                
+                List<String> levels = item.getLevels();
+                String level = "-";
+                
+                if (levels != null && !levels.isEmpty()) {
+                    level = levels.get(0);
+                }
+                                
+                int hargaLevel = 0;
+                
+                if (dataLevel.containsKey(level)) {
+                    hargaLevel = dataLevel.get(level);
+                    totalHarga += hargaLevel;
+                }
+                
+                String itemLine = String.format(
+                    "%d x %s @ %.2f\nTopping: %s\nLevel: %s",
+                    item.getKuantitas(),
+                    truncateText(item.getNama(), 15), // Potong nama panjang
+                    item.getHarga(),
+                    toppings,
+                    level.equals("") || level.equals("-") ? "-" : level + " - Rp. " + hargaLevel
+                );
+                
+                String totalLine = String.format("     SubTotal: %.2f", 
+                    item.getKuantitas() * item.getHarga() + hargaTopping + hargaLevel);
 
                 // Check if we need to create a new page based on content height
                 if (currentPageHeight > maxPageHeight) {
@@ -176,7 +233,7 @@ public class Struk {
 
                 // Add the item lines
                 addCenteredParagraph(document, itemLine, fontSmall());
-                addCenteredParagraph(document, totalLine, fontSmall());
+                addCenteredParagraph(document, totalLine, fontMediumBold());
 
                 // Update current height (adjust based on font size and line spacing)
                 currentPageHeight += 20;  // You can modify this based on your font size/spacing

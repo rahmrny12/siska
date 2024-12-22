@@ -8,6 +8,16 @@ import ComponentUI.BuatLaporan;
 import ComponentUI.MessageDialog;
 import Helper.UserInfo;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -15,8 +25,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Year;
 import java.util.HashMap;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -53,6 +69,53 @@ public class FormLaporan extends javax.swing.JFrame {
         loadDataProfit();
         loadDataProduk();
     }
+    
+    private void loadTableStokMasuk(Integer bulan, Integer tahun) {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Tanggal");
+        model.addColumn("Nama Supplier");
+        model.addColumn("Nama Bahan");
+        model.addColumn("Stok Awal");
+        model.addColumn("Stok Masuk");
+        model.addColumn("Total Stok");
+
+        //Menampilkan data kedalam tabel
+        try {
+            String query = "SELECT stok_masuk.tanggal, supplier.nama_supplier, bahan.nama_bahan, detail_stok_masuk.stok_awal, detail_stok_masuk.stok_masuk, detail_stok_masuk.total_stok"
+                    + " FROM stok_masuk, detail_stok_masuk, supplier, bahan"
+                    + " WHERE stok_masuk.id_stok_masuk = detail_stok_masuk.id_stok_masuk"
+                    + " AND detail_stok_masuk.id_bahan = bahan.id_bahan AND stok_masuk.id_supplier = supplier.id_supplier"
+                    + " ORDER BY stok_masuk.id_stok_masuk DESC";
+        if (bulan != null || tahun != null) {
+        query += " AND";
+        boolean isFirst = true;
+        if (bulan != null) {
+            query += " MONTH(tanggal) = ?";
+            isFirst = false;
+        }
+        if (tahun != null) {
+            query += (isFirst ? "" : " AND") + " YEAR(tanggal) = ?";
+        }
+    }
+        PreparedStatement ps = conn.prepareStatement(query);
+        int index = 1;
+        if (bulan != null) {
+            ps.setInt(index++, bulan);
+        }
+        if (tahun != null) {
+            ps.setInt(index++, tahun);
+        }
+        ResultSet res = ps.executeQuery();
+            while(res.next()){
+                model.addRow(new Object[] {res.getString(1),
+                    res.getString(2),res.getString(3),res.getString(4),res.getString(5),res.getString(6)});
+                }
+            tblStokMasuk.setModel(model);
+        }catch (Exception e) {
+        e.printStackTrace();                
+        }                           
+    }
+    
     private void loadTableLaporanLaba(Integer bulan, Integer tahun) {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID Laporan Laba");
@@ -125,14 +188,16 @@ public class FormLaporan extends javax.swing.JFrame {
         try {
             String query = "SELECT id_transaksi, jenis_pesanan, total_harga, total_pembayaran, kembalian, tanggal_transaksi FROM transaksi";
             if (bulan != null || tahun != null) {
-            query += " WHERE";
-            if (bulan != null) {
-                query += " MONTH(tanggal_transaksi) = ?";
+                query += " WHERE";
+                if (bulan != null) {
+                    query += " MONTH(tanggal_transaksi) = ?";
+                }
+                if (tahun != null) {
+                    query += (bulan != null ? " AND" : "") + " YEAR(tanggal_transaksi) = ?";
+                }
             }
-            if (tahun != null) {
-                query += (bulan != null ? " AND" : "") + " YEAR(tanggal_transaksi) = ?";
-            }
-        }
+            query += " ORDER BY id_transaksi DESC";
+            
         PreparedStatement ps = conn.prepareStatement(query);
         int index = 1;
         if (bulan != null) {
@@ -159,7 +224,6 @@ public class FormLaporan extends javax.swing.JFrame {
         model.addColumn("Tanggal Laporan");
         model.addColumn("Total pengeluaran");
         model.addColumn("Deskripsi Pengeluaran");
-        
 
         //Menampilkan data kedalam tabel
         try {
@@ -185,7 +249,8 @@ public class FormLaporan extends javax.swing.JFrame {
             while(res.next()){
                 model.addRow(new Object[] {res.getString(1),
                     res.getString(2),res.getString(3),});
-                }
+            }
+            
             tblLaporanPengeluaran.setModel(model);
         }catch (Exception e) {
         e.printStackTrace();                
@@ -243,17 +308,16 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel55 = new javax.swing.JLabel();
         jLabel56 = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
-        tblMenu4 = new javax.swing.JTable();
+        tblStokMasuk = new javax.swing.JTable();
         jLabel57 = new javax.swing.JLabel();
-        cbBulan = new javax.swing.JComboBox<>();
-        cbTahun = new javax.swing.JComboBox<>();
+        bulanStokMasuk = new javax.swing.JComboBox<>();
+        tahunStokMasuk = new javax.swing.JComboBox<>();
         kartuStok = new javax.swing.JPanel();
         jLabel58 = new javax.swing.JLabel();
         jLabel59 = new javax.swing.JLabel();
         jLabel60 = new javax.swing.JLabel();
         filterBulanKartuStok = new javax.swing.JComboBox<>();
         filterTahunKartuStok = new javax.swing.JComboBox<>();
-        btnEkspor = new javax.swing.JButton();
         jLabel61 = new javax.swing.JLabel();
         txtPilihBahan = new javax.swing.JComboBox<>();
         jPanel1 = new javax.swing.JPanel();
@@ -553,6 +617,7 @@ public class FormLaporan extends javax.swing.JFrame {
                 "Tanggal", "Deskripsi", "Total"
             }
         ));
+        tblLaporanPengeluaran.setRowHeight(40);
         tblLaporanPengeluaran.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblLaporanPengeluaranMouseClicked(evt);
@@ -727,8 +792,8 @@ public class FormLaporan extends javax.swing.JFrame {
         jLabel56.setForeground(new java.awt.Color(255, 255, 255));
         jLabel56.setText("Tahun");
 
-        tblMenu4.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        tblMenu4.setModel(new javax.swing.table.DefaultTableModel(
+        tblStokMasuk.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        tblStokMasuk.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -739,33 +804,34 @@ public class FormLaporan extends javax.swing.JFrame {
                 "Tanggal", "Bahan", "Harga Pasar", "Harga Beli"
             }
         ));
-        tblMenu4.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblStokMasuk.setRowHeight(40);
+        tblStokMasuk.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblMenu4MouseClicked(evt);
+                tblStokMasukMouseClicked(evt);
             }
         });
-        jScrollPane7.setViewportView(tblMenu4);
+        jScrollPane7.setViewportView(tblStokMasuk);
 
         jLabel57.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel57.setForeground(new java.awt.Color(255, 255, 255));
         jLabel57.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel57.setText("Laporan Stok Masuk");
 
-        cbBulan.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        cbBulan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
-        cbBulan.setPreferredSize(new java.awt.Dimension(64, 22));
-        cbBulan.addActionListener(new java.awt.event.ActionListener() {
+        bulanStokMasuk.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        bulanStokMasuk.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
+        bulanStokMasuk.setPreferredSize(new java.awt.Dimension(64, 22));
+        bulanStokMasuk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBulanActionPerformed(evt);
+                bulanStokMasukActionPerformed(evt);
             }
         });
 
-        cbTahun.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        cbTahun.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026" }));
-        cbTahun.setPreferredSize(new java.awt.Dimension(64, 22));
-        cbTahun.addActionListener(new java.awt.event.ActionListener() {
+        tahunStokMasuk.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tahunStokMasuk.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026" }));
+        tahunStokMasuk.setPreferredSize(new java.awt.Dimension(64, 22));
+        tahunStokMasuk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbTahunActionPerformed(evt);
+                tahunStokMasukActionPerformed(evt);
             }
         });
 
@@ -779,17 +845,17 @@ public class FormLaporan extends javax.swing.JFrame {
                         .addGap(156, 156, 156)
                         .addComponent(jLabel57, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(laporanStokMasukLayout.createSequentialGroup()
-                        .addGap(113, 113, 113)
-                        .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE))
+                        .addGap(24, 24, 24)
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1013, Short.MAX_VALUE))
                     .addGroup(laporanStokMasukLayout.createSequentialGroup()
                         .addGap(309, 309, 309)
                         .addComponent(jLabel55, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbBulan, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bulanStokMasuk, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(34, 34, 34)
                         .addComponent(jLabel56, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbTahun, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(tahunStokMasuk, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(24, 24, 24))
         );
         laporanStokMasukLayout.setVerticalGroup(
@@ -800,9 +866,9 @@ public class FormLaporan extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(laporanStokMasukLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel55, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbBulan, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bulanStokMasuk, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel56, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbTahun, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tahunStokMasuk, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
                 .addGap(24, 24, 24))
@@ -840,16 +906,6 @@ public class FormLaporan extends javax.swing.JFrame {
         filterTahunKartuStok.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTahunKartuStokActionPerformed(evt);
-            }
-        });
-
-        btnEkspor.setBackground(new java.awt.Color(204, 204, 204));
-        btnEkspor.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnEkspor.setForeground(new java.awt.Color(51, 51, 51));
-        btnEkspor.setText("Cetak");
-        btnEkspor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEksporActionPerformed(evt);
             }
         });
 
@@ -912,8 +968,7 @@ public class FormLaporan extends javax.swing.JFrame {
                         .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(filterTahunKartuStok, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnEkspor)))
+                        .addGap(0, 452, Short.MAX_VALUE)))
                 .addGap(19, 19, 19))
         );
         kartuStokLayout.setVerticalGroup(
@@ -930,8 +985,7 @@ public class FormLaporan extends javax.swing.JFrame {
                         .addComponent(jLabel58, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(filterBulanKartuStok, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel59, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(filterTahunKartuStok, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnEkspor, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(filterTahunKartuStok, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 407, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -957,25 +1011,25 @@ public class FormLaporan extends javax.swing.JFrame {
             .addGroup(dashboardLayout.createSequentialGroup()
                 .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(dashboardLayout.createSequentialGroup()
-                        .addGap(167, 167, 167)
+                        .addGap(172, 172, 172)
                         .addComponent(jLabel64, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(dashboardLayout.createSequentialGroup()
                         .addGap(24, 24, 24)
-                        .addComponent(chartContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
-                        .addGap(24, 24, 24)
-                        .addComponent(panelProduk, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)))
-                .addGap(24, 24, 24))
+                        .addComponent(chartContainerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 509, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                        .addComponent(panelProduk, javax.swing.GroupLayout.PREFERRED_SIZE, 466, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(30, 30, 30))
         );
         dashboardLayout.setVerticalGroup(
             dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dashboardLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addComponent(jLabel64, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                 .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chartContainerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panelProduk, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(142, Short.MAX_VALUE))
+                    .addComponent(chartContainerPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelProduk, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(96, Short.MAX_VALUE))
         );
 
         mainPanel.add(dashboard, "card2");
@@ -1079,11 +1133,11 @@ public class FormLaporan extends javax.swing.JFrame {
         
         // Membuat chart
         JFreeChart chart = ChartFactory.createBarChart(
-                "Produk Terjual Per Tanggal", // Judul chart
+                "Produk Terjual", // Judul chart
                 "Nama Menu", // Label sumbu X
                 "Jumlah Terjual", // Label sumbu Y
                 dataset, // Dataset
-                PlotOrientation.VERTICAL, // Orientasi plot vertikal
+                PlotOrientation.HORIZONTAL, // Orientasi plot vertikal
                 true, // Menampilkan legend
                 true, // Menampilkan tooltips
                 false // Tidak menampilkan URL
@@ -1193,7 +1247,7 @@ public class FormLaporan extends javax.swing.JFrame {
         
         loadYears(filterTahunKartuStok);
         loadDataStokBahan();
-        loadKartuStok();
+        loadKartuStok(null, null);
     }//GEN-LAST:event_btnToKartuStokActionPerformed
 
     private void loadDataStokBahan() {
@@ -1222,24 +1276,52 @@ public class FormLaporan extends javax.swing.JFrame {
         }
     }
     
-    public void loadKartuStok() {
+    public void loadKartuStok(Integer bulan, Integer tahun) {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Tanggal");
         model.addColumn("Keterangan");
         model.addColumn("Jumlah Masuk");
         model.addColumn("Jumlah Keluar");
-        model.addColumn("Saldo");
+        model.addColumn("Stok Saat Ini");
         
-        String namaBahan = (String) txtPilihBahan.getSelectedItem();
-        Object[] data = dataStokBahan.get(namaBahan);
-        int idBahan = (int) data[0]; // ID bahan
+        String selectedBahan = (String) txtPilihBahan.getSelectedItem();
+        
+        Integer idBahan = null;
+        
+        if (selectedBahan != null && dataStokBahan.containsKey(selectedBahan)) {
+            String namaBahan = (String) txtPilihBahan.getSelectedItem();
+            Object[] data = dataStokBahan.get(namaBahan);
+            idBahan = (Integer) data[0]; // ID bahan
+        }
         
         try {
             //Menampilkan data kedalam tabel
-            String query = "SELECT tanggal, keterangan, jumlah_masuk, jumlah_keluar, saldo FROM kartu_stok WHERE id_bahan = ? ORDER BY tanggal ASC";
+            String query = "SELECT tanggal, keterangan, jumlah_masuk, jumlah_keluar, saldo FROM kartu_stok WHERE id_bahan = ?";
+
+            if (bulan != null || tahun != null) {
+                if (bulan != null) {
+                    query += " AND MONTH(tanggal) = ?";
+                }
+                if (tahun != null) {
+                    query += " AND YEAR(tanggal) = ?";
+                }
+            }
+
+            query += " ORDER BY id_kartu_stok DESC";
             
             PreparedStatement ps = conn.prepareStatement(query);
-            ps.setInt(1, idBahan);
+            if (idBahan == null) {
+                ps.setString(1, ""); // Set nilai kosong
+            } else {
+                ps.setInt(1, idBahan); // Set nilai idBahan seperti biasa
+            }
+            int index = 2;
+            if (bulan != null) {
+                ps.setInt(index++, bulan);
+            }
+            if (tahun != null) {
+                ps.setInt(index++, tahun);
+            }
             
             ResultSet res = ps.executeQuery();
             
@@ -1305,7 +1387,15 @@ public class FormLaporan extends javax.swing.JFrame {
     }//GEN-LAST:event_btnToLaporanLabaActionPerformed
 
     private void btnToStokMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnToStokMasukActionPerformed
-        // TODO add your handling code here:
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+
+        mainPanel.add(laporanStokMasuk);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+        
+        loadTableStokMasuk(null,null);
     }//GEN-LAST:event_btnToStokMasukActionPerformed
 
     private void tblRiwayatTransaksiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblRiwayatTransaksiMouseClicked
@@ -1377,17 +1467,39 @@ public class FormLaporan extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_filterTahunKeluarActionPerformed
 
-    private void tblMenu4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMenu4MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tblMenu4MouseClicked
+    private void tblStokMasukMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblStokMasukMouseClicked
+        int baris = tblLaporanLaba.rowAtPoint(evt.getPoint());
+        String tanggal = tblLaporanLaba.getValueAt(baris, 0).toString();
+        String nama_supplier = tblLaporanLaba.getValueAt(baris, 1).toString();
+        String nama_bahan = tblLaporanLaba.getValueAt(baris, 2).toString();
+        String stok_awal = tblLaporanLaba.getValueAt(baris, 3).toString();
+        String stok_masuk = tblLaporanLaba.getValueAt(baris, 4).toString();
+        String total_stok = tblLaporanLaba.getValueAt(baris, 5).toString();
+    }//GEN-LAST:event_tblStokMasukMouseClicked
 
-    private void cbBulanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBulanActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbBulanActionPerformed
+    private void bulanStokMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bulanStokMasukActionPerformed
+        int bulanIndex = bulanStokMasuk.getSelectedIndex() + 1;
+        // Ambil nilai tahun dari ComboBox tahun
+        Integer tahunDipilih = null;
+        if (tahunStokMasuk.getSelectedItem() != null) {
+            tahunDipilih = Integer.parseInt(tahunStokMasuk.getSelectedItem().toString());
+        }
 
-    private void cbTahunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTahunActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbTahunActionPerformed
+        // Panggil metode untuk memuat tabel dengan filter bulan dan tahun
+        loadTableStokMasuk (bulanIndex,tahunDipilih); 
+    }//GEN-LAST:event_bulanStokMasukActionPerformed
+
+    private void tahunStokMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tahunStokMasukActionPerformed
+        int tahunDipilih = Integer.parseInt(tahunStokMasuk.getSelectedItem().toString());
+        // Ambil nilai bulan dari ComboBox bulan
+        Integer bulanIndex = null;
+        if (bulanStokMasuk.getSelectedIndex() >= 0) {
+            bulanIndex = bulanStokMasuk.getSelectedIndex() + 1;
+        }
+
+        // Panggil metode untuk memuat tabel dengan filter bulan dan tahun
+        loadTableStokMasuk (bulanIndex,tahunDipilih);
+    }//GEN-LAST:event_tahunStokMasukActionPerformed
 
     private void btnBuatLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuatLaporanActionPerformed
         BuatLaporan BuatLaporan = new BuatLaporan();
@@ -1395,24 +1507,38 @@ public class FormLaporan extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBuatLaporanActionPerformed
 
     private void filterBulanKartuStokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterBulanKartuStokActionPerformed
-        // TODO add your handling code here:
+        int bulanIndex = filterBulanKartuStok.getSelectedIndex() + 1;
+        // Ambil nilai tahun dari ComboBox tahun
+        Integer tahunDipilih = null;
+        if (filterTahunKartuStok.getSelectedItem() != null) {
+            tahunDipilih = Integer.parseInt(filterTahunKartuStok.getSelectedItem().toString());
+        }
+
+        // Panggil metode untuk memuat tabel dengan filter bulan dan tahun
+        loadKartuStok(bulanIndex, tahunDipilih);
     }//GEN-LAST:event_filterBulanKartuStokActionPerformed
 
     private void filterTahunKartuStokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterTahunKartuStokActionPerformed
-        // TODO add your handling code here:
+        if (filterTahunKartuStok.getSelectedItem() != null) {
+            int tahunDipilih = Integer.parseInt(filterTahunKartuStok.getSelectedItem().toString());
+            // Ambil nilai bulan dari ComboBox bulan
+            Integer bulanIndex = null;
+            if (filterBulanKartuStok.getSelectedIndex() >= 0) {
+                bulanIndex = filterBulanKartuStok.getSelectedIndex() + 1;
+            }
+
+            // Panggil metode untuk memuat tabel dengan filter bulan dan tahun
+            loadKartuStok(bulanIndex, tahunDipilih);
+        }
     }//GEN-LAST:event_filterTahunKartuStokActionPerformed
 
     private void txtPilihBahanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPilihBahanActionPerformed
-        loadKartuStok();
+        loadKartuStok(null, null);
     }//GEN-LAST:event_txtPilihBahanActionPerformed
 
     private void tblKartuStokMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblKartuStokMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_tblKartuStokMouseClicked
-
-    private void btnEksporActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEksporActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEksporActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1483,7 +1609,6 @@ public class FormLaporan extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bodyPanel;
     private javax.swing.JButton btnBuatLaporan;
-    private javax.swing.JButton btnEkspor;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnToDashboard;
     private javax.swing.JButton btnToKartuStok;
@@ -1491,8 +1616,7 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JButton btnToLaporanPengeluaran;
     private javax.swing.JButton btnToRiwayatTransaksi;
     private javax.swing.JButton btnToStokMasuk;
-    private javax.swing.JComboBox<String> cbBulan;
-    private javax.swing.JComboBox<String> cbTahun;
+    private javax.swing.JComboBox<String> bulanStokMasuk;
     private javax.swing.JPanel chartContainerPanel;
     private javax.swing.JPanel dashboard;
     private javax.swing.JComboBox<String> filterBulanKartuStok;
@@ -1537,11 +1661,12 @@ public class FormLaporan extends javax.swing.JFrame {
     private javax.swing.JPanel panelProduk;
     private javax.swing.JPanel panelUserProfile1;
     private javax.swing.JPanel riwayatTransaksi;
+    private javax.swing.JComboBox<String> tahunStokMasuk;
     private javax.swing.JTable tblKartuStok;
     private javax.swing.JTable tblLaporanLaba;
     private javax.swing.JTable tblLaporanPengeluaran;
-    private javax.swing.JTable tblMenu4;
     private javax.swing.JTable tblRiwayatTransaksi;
+    private javax.swing.JTable tblStokMasuk;
     private javax.swing.JComboBox<String> txtPilihBahan;
     // End of variables declaration//GEN-END:variables
 }

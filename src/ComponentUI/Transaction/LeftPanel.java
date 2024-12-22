@@ -1,23 +1,35 @@
 package ComponentUI.Transaction;
 
 import ComponentUI.MessageDialog;
+import ComponentUI.ToppingPopup;
 import ComponentUI.Transaction.PaymentPopup.PaymentListener;
+import Helper.KartuStok;
+import Model.Bahan;
 import Model.OrderItem;
+import Model.Topping;
 import View.FormTransaksi;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LeftPanel extends JPanel {
 
@@ -29,7 +41,8 @@ public class LeftPanel extends JPanel {
     private JTextField txtPhone;
     
     private FormTransaksi formTransaksi;
-    private Map<Integer, OrderItem> orderItems = new LinkedHashMap<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
+
     private int totalHarga = 0;
     private Integer IDPelanggan = null;
     
@@ -39,7 +52,6 @@ public class LeftPanel extends JPanel {
     public LeftPanel() {
         conn = Helper.Database.OpenConnection();
         
-        dataTopping.put("None", 0);
         dataTopping.put("Dumpling - Rp. 1000", 1000);
         dataTopping.put("Telur - Rp. 3000", 3000);
         dataTopping.put("Cuanki - Rp. 2000", 2000);
@@ -194,15 +206,22 @@ public class LeftPanel extends JPanel {
     }
     
     public void addOrderItem(int id, String nama, double harga, String jenis) {
-        // Check if the item already exists
-        if (orderItems.containsKey(id)) {
-            // Update quantity for existing item
-            OrderItem existingItem = orderItems.get(id);
-            existingItem.setKuantitas(existingItem.getKuantitas() + 1);
-        } else {
-            // Create a new order item
-            OrderItem newItem = new OrderItem(id, nama, harga, jenis);
-            orderItems.put(id, newItem);
+        OrderItem newItem = new OrderItem(id, nama, harga, jenis);
+
+        // Check if an item with the same id and jenis exists
+        boolean itemExists = false;
+        for (OrderItem existingItem : orderItems) {
+            if (existingItem.getId() == id && jenis.equals("minuman")) {
+                // Update quantity for existing item
+                existingItem.setKuantitas(existingItem.getKuantitas() + 1);
+                itemExists = true;
+                break;
+            }
+        }
+
+        // If the item doesn't exist, add it as a new item
+        if (!itemExists) {
+            orderItems.add(newItem);
         }
 
         // Update the UI to reflect changes
@@ -212,8 +231,10 @@ public class LeftPanel extends JPanel {
     
     private void refreshOrderSummaryPanel() {
         orderSummaryPanel.removeAll();
+        
+        orderItems.sort(Comparator.comparing(item -> item.getJenis().equalsIgnoreCase("makanan") ? 1 : 2));
 
-        for (OrderItem item : orderItems.values()) {
+        for (OrderItem item : orderItems) {
             JPanel orderItemPanel = new JPanel();
             orderItemPanel.setLayout(new BoxLayout(orderItemPanel, BoxLayout.Y_AXIS));
 
@@ -241,44 +262,55 @@ public class LeftPanel extends JPanel {
                 secondPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
                 secondPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-                secondPanel.add(new JLabel("Topping:"));
-                JComboBox<String> toppingComboBox = new JComboBox<>(dataTopping.keySet().toArray(new String[0]));
-                toppingComboBox.setSelectedItem("None");
-                toppingComboBox.setMaximumSize(new Dimension(100, toppingComboBox.getPreferredSize().height + 5 * 2));
-                toppingComboBox.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 10));
-                toppingComboBox.addActionListener(e -> {
-                    if (orderItems.containsKey(item.getId())) {
-                        OrderItem existingItem = orderItems.get(item.getId());
+                //* awal pilih topping // 
+                
+                // Panel untuk menampilkan topping yang dipilih
+                JPanel toppingPanel = new JPanel();
+                toppingPanel.setLayout(new BoxLayout(toppingPanel, BoxLayout.Y_AXIS));
 
-                        // Replace the toppings list with the selected topping only
-                        existingItem.getToppings().clear();
-                        existingItem.getToppings().add((String) toppingComboBox.getSelectedItem());
+                // Load the current toppings (badges) first
+                loadToppings(toppingPanel, item);
+                
+                //* akhir pilih topping //
 
-                        
-                        updateTotal();
-                    }
-                });
-                secondPanel.add(toppingComboBox);
+                // Create a panel to hold the label and the combo box
+                JPanel levelPanel = new JPanel();
+                levelPanel.setLayout(new BoxLayout(levelPanel, BoxLayout.Y_AXIS)); // Vertical layout
+                levelPanel.setAlignmentX(Component.LEFT_ALIGNMENT); // Align to the left
+                levelPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0)); // Add some left padding
 
-                secondPanel.add(new JLabel("Level:"));
+                // Add the label
+                JLabel levelLabel = new JLabel("Level:");
+                levelLabel.setAlignmentX(Component.LEFT_ALIGNMENT); // Align the label
+                levelPanel.add(levelLabel);
+
+                // Add some vertical spacing
+                levelPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Space between label and combo box
+
+                // Add the combo box
                 JComboBox<String> levelComboBox = new JComboBox<>(dataLevel.keySet().toArray(new String[0]));
                 levelComboBox.setSelectedItem("None");
-                levelComboBox.setMaximumSize(new Dimension(100, levelComboBox.getPreferredSize().height + 5 * 2));
-                levelComboBox.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+                levelComboBox.setMaximumSize(new Dimension(200, levelComboBox.getPreferredSize().height + 10)); // Adjust max size
+                levelComboBox.setAlignmentX(Component.LEFT_ALIGNMENT); // Align the combo box
                 levelComboBox.addActionListener(e -> {
-                    if (orderItems.containsKey(item.getId())) {
-                        OrderItem existingItem = orderItems.get(item.getId());
+                    for (OrderItem existingItem : orderItems) {
+                        if (existingItem.getId() == item.getId()) {
+                            // Replace the levels list with the selected level only
+                            existingItem.getLevels().clear();
+                            existingItem.getLevels().add((String) levelComboBox.getSelectedItem());
 
-                        // Replace the toppings list with the selected topping only
-                        existingItem.getLevels().clear();
-                        existingItem.getLevels().add((String) levelComboBox.getSelectedItem());
-                    
-                        updateTotal();
+                            updateTotal();
+                            break; // Exit the loop once the item is found and updated
+                        }
                     }
                 });
-                secondPanel.add(levelComboBox);
-                
-                secondPanel.add(Box.createHorizontalGlue());
+                levelPanel.add(levelComboBox);
+
+                levelPanel.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));  // 1/3 of the width
+
+                secondPanel.add(levelPanel);
+                secondPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Spacing between panels
+                secondPanel.add(toppingPanel);
 
                 orderItemPanel.add(secondPanel);
             }
@@ -290,9 +322,8 @@ public class LeftPanel extends JPanel {
                 removeButton.setBorderPainted(false); // Remove button border
                 removeButton.setFocusPainted(false); // Remove focus border
                 removeButton.setPreferredSize(new Dimension(14, 14));
-                removeButton.addActionListener(e -> {
-                    // Handle delete action
-                    orderItems.remove(item.getId()); // Remove item from the list
+                removeButton.addActionListener(e -> {                       
+                    orderItems.removeIf(existingItem -> existingItem.getId() == item.getId());
                     orderSummaryPanel.remove(orderItemPanel); // Remove panel from UI
                     orderSummaryPanel.revalidate();
                     orderSummaryPanel.repaint();
@@ -313,21 +344,224 @@ public class LeftPanel extends JPanel {
             // Add the order item panel to the order summary panel
             orderSummaryPanel.add(orderItemPanel);
         }
-
+        
         orderSummaryPanel.revalidate();
         orderSummaryPanel.repaint();
+    }
+
+    private void loadToppings(JPanel toppingPanel, OrderItem item) {
+        ButtonGroup removeButtonGroup = new ButtonGroup();
+        
+        toppingPanel.removeAll();
+        
+        // Add the label
+        JLabel toppingLabel = new JLabel("Topping:");
+        toppingLabel.setAlignmentX(Component.LEFT_ALIGNMENT); // Align the label
+        toppingPanel.add(toppingLabel);
+
+        // Add some vertical spacing
+        toppingPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Space between label and combo box
+        
+        for (Topping topping : item.getToppings()) {
+            String namaTopping = topping.getNamaTopping(); // Nama topping
+            int jumlahTopping = topping.getJumlahTopping(); // Jumlah topping
+            int idTopping = topping.getIdBahan();
+            
+            // Membuat label untuk topping
+            JLabel toppingBadgeLabel = new JLabel(namaTopping + " x" + jumlahTopping);
+            toppingBadgeLabel.setOpaque(true);
+            toppingBadgeLabel.setBackground(Color.WHITE);
+            toppingBadgeLabel.setForeground(Color.RED);
+            toppingBadgeLabel.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            toppingBadgeLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+            toppingBadgeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            toppingBadgeLabel.setPreferredSize(new Dimension(80, 20));
+            
+            // Tombol "X" untuk menghapus topping
+            JToggleButton btnRemove = new JToggleButton("X"); // Menggunakan JToggleButton untuk "grouping"
+            btnRemove.setPreferredSize(new Dimension(25, 25));
+            btnRemove.setFont(new Font("Arial", Font.BOLD, 12));
+            btnRemove.setForeground(Color.WHITE);
+            btnRemove.setBackground(Color.RED);
+            btnRemove.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            btnRemove.setFocusPainted(false);
+//                    btnRemove.addMouseListener(new MouseAdapter() {
+//                        @Override
+//                        public void mouseClicked(MouseEvent e) {
+//                            String[] confirmButtonLabels = {"OK", "NO"};
+//
+//                            ActionListener yesAction = ev -> {
+//                                PreparedStatement stmt = null;
+//
+//                                try {
+//                                    int idMenu = Integer.parseInt(txtIDMenu.getText());
+//
+//                                    // Query untuk menghapus topping berdasarkan id_menu dan id_topping
+//                                    String query = "DELETE FROM `topping_menu` WHERE `id_menu` = ? AND `id_topping` = ?";
+//                                    stmt = conn.prepareStatement(query);
+//                                    stmt.setInt(1, idMenu);
+//                                    stmt.setInt(2, idTopping); // Menggunakan ID topping untuk menghapus
+//                                    stmt.executeUpdate();
+//
+//                                    loadToppingMenu(); // Memuat topping menu terbaru
+//
+//                                    String[] buttonLabels = {"OK"};
+//                                    MessageDialog dialog = new MessageDialog(
+//                                        "Informasi",
+//                                        "Topping berhasil dihapus.",
+//                                        buttonLabels,
+//                                        null // Menutup dialog secara default
+//                                    );
+//                                    dialog.showDialog();
+//                                } catch (SQLException ex) {
+//                                    String[] buttonLabels = {"OK"};
+//                                    MessageDialog dialog = new MessageDialog(
+//                                        "Error",
+//                                        "Gagal menghapus topping: " + ex.getMessage(),
+//                                        buttonLabels,
+//                                        null
+//                                    );
+//                                    dialog.showDialog();
+//                                } finally {
+//                                    if (stmt != null) {
+//                                        try {
+//                                            stmt.close();
+//                                        } catch (SQLException ex) {
+//                                            ex.printStackTrace();
+//                                        }
+//                                    }
+//                                }
+//                            };
+//                            ActionListener noAction = ev -> {
+//                                // Tidak melakukan apa-apa jika "NO"
+//                                return;
+//                            };
+//
+//                            // Menampilkan konfirmasi penghapusan topping
+//                            MessageDialog dialog = new MessageDialog(
+//                                "Konfirmasi Hapus",
+//                                "Apakah Anda yakin ingin menghapus topping tersebut?",
+//                                confirmButtonLabels,
+//                                new ActionListener[]{yesAction, noAction}
+//                            );
+//                            dialog.showDialog();
+//                        }
+//                    });
+
+            removeButtonGroup.add(btnRemove);
+
+            // Panel untuk menampilkan topping
+            JPanel toppingBadgePanel = new JPanel();
+            toppingBadgePanel.setLayout(new BorderLayout());
+            toppingBadgePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0)); // Bottom padding of 5px
+            toppingPanel.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    // Dynamically set the child width to match the parent
+                    int parentWidth = toppingPanel.getWidth();
+                    toppingBadgePanel.setMaximumSize(new Dimension(parentWidth, 50)); // Match parent's width, keep height fixed
+                    toppingBadgePanel.setPreferredSize(new Dimension(parentWidth, 50)); // Optional
+                    toppingBadgePanel.revalidate();
+                }
+            });
+
+            // Set the preferred size of the components so they fit their content
+            toppingBadgeLabel.setPreferredSize(new Dimension(toppingBadgeLabel.getPreferredSize().width, toppingBadgeLabel.getPreferredSize().height)); // Optional: Set preferred size
+            btnRemove.setPreferredSize(new Dimension(btnRemove.getPreferredSize().width, btnRemove.getPreferredSize().height)); // Optional: Set preferred size
+
+
+            // Add the toppingLabel to the center
+            toppingBadgePanel.add(toppingBadgeLabel, BorderLayout.CENTER);
+            // Add the btnRemove button to the east (right side)
+            toppingBadgePanel.add(btnRemove, BorderLayout.EAST);
+            toppingBadgePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50)); // 2/3 of the widthtoppingBadge.setMaximumSize(new Dimension(50, Integer.MAX_VALUE)); // 2/3 of the width
+
+            // Add the panel to the main topping panel
+            toppingPanel.add(toppingBadgePanel);
+        }
+        
+        // Tombol untuk menambah topping
+        JButton btnAddTopping = new JButton("Add Topping");
+        btnAddTopping.setAlignmentX(Component.LEFT_ALIGNMENT); // Left-align the button
+        btnAddTopping.setMaximumSize(new Dimension(200, btnAddTopping.getPreferredSize().height + 10)); // Adjust max size
+
+        btnAddTopping.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Open the BahanPopup form
+                ToppingPopup addToppingPopup = new ToppingPopup();
+                addToppingPopup.setVisible(true);
+
+                // Set the action listener for the popup
+                addToppingPopup.setAddToppingActionListener((Bahan topping, int jumlahTopping) -> {
+                    // update stok bahan topping
+                    try {
+                        int idBahan = topping.getIDBahan(); // ID bahan untuk topping
+
+                        // Check stock
+                        String checkStockQuery = "SELECT stok_bahan FROM bahan WHERE id_bahan = ?";
+                        PreparedStatement checkStockStmt = conn.prepareStatement(checkStockQuery);
+                        checkStockStmt.setInt(1, idBahan);
+                        ResultSet stockRs = checkStockStmt.executeQuery();
+                        
+                        if (stockRs.next()) {
+                            int currentStock = stockRs.getInt("stok_bahan");
+                            
+                            if (currentStock < jumlahTopping) {
+                                throw new SQLException("Stok tidak mencukupi untuk topping berikut: " + topping.getNamaBahan());
+                            }
+
+                            // Update stock
+                            String updateStockQuery = "UPDATE bahan SET stok_bahan = stok_bahan - ? WHERE id_bahan = ?";
+                            PreparedStatement updateStockStmt = conn.prepareStatement(updateStockQuery);
+                            updateStockStmt.setInt(1, jumlahTopping);
+                            updateStockStmt.setInt(2, idBahan);
+                            updateStockStmt.executeUpdate();
+
+                            // Tambahkan ke kartu stok
+                            String keterangan = "Transaksi";
+                            int jumlahMasuk = 0;
+                            int jumlahKeluar = jumlahTopping;
+                            
+                            KartuStok.insertKartuStok(conn, idBahan, keterangan, jumlahMasuk, jumlahKeluar, "transaksi");
+                        } else {
+                            throw new SQLException("Bahan dengan ID: " + idBahan + " tidak ditemukan.");
+                        }
+                    } catch (SQLException sqlEx) {
+                        JOptionPane.showMessageDialog(null, "Gagal memeriksa stok topping. " + sqlEx.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    
+                    item.addTopping(topping.getIDBahan(), topping.getNamaBahan(), topping.getHargaBahan(), jumlahTopping);
+
+                    loadToppings(toppingPanel, item); // Reload toppings after adding a new one
+                });
+            }
+        });
+
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0)); // Align to the left
+        buttonWrapper.add(btnAddTopping);
+
+        toppingPanel.setMaximumSize(new Dimension(150, Integer.MAX_VALUE)); // 2/3 of the width
+        
+        // Add the button to the panel after loading the toppings
+        toppingPanel.add(buttonWrapper);
+        
+        toppingPanel.revalidate();
+        toppingPanel.repaint();
+        
+        updateTotal();
     }
     
     private void updateTotal() {
         totalHarga = 0;
 
-        for (OrderItem item : orderItems.values()) {
+        for (OrderItem item : orderItems) {
             totalHarga += item.getHarga() * item.getKuantitas();
             
-            for (String topping : item.getToppings()) {
-                if (dataTopping.containsKey(topping)) {
-                    totalHarga += dataTopping.get(topping);
-                }
+            for (Topping topping : item.getToppings()) {
+                totalHarga += topping.getHargaTopping() * topping.getJumlahTopping();
             }
             
             for (String level : item.getLevels()) {

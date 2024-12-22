@@ -19,20 +19,21 @@ import java.util.Date;
 public class KartuStok {
     public static void insertKartuStok(Connection conn, int idBahan, String keterangan, int jumlahMasuk, int jumlahKeluar, String type) throws SQLException {
         // Query untuk mendapatkan saldo terakhir bahan
-        String querySaldo = "SELECT * FROM kartu_stok WHERE id_bahan = ? ORDER BY id_kartu_stok DESC LIMIT 1";
+        String queryBahan = "SELECT stok_bahan FROM bahan WHERE id_bahan = ?";
         
-        try (PreparedStatement stmtSaldo = conn.prepareStatement(querySaldo)) {
-            stmtSaldo.setInt(1, idBahan);
-            ResultSet rs = stmtSaldo.executeQuery();
+        try (PreparedStatement stmtBahan = conn.prepareStatement(queryBahan)) {
+            stmtBahan.setInt(1, idBahan);
+            ResultSet rs = stmtBahan.executeQuery();
+            int saldoBaru = 0;
+            
             if (rs.next()) {
-                int IDKartuStok = rs.getInt("id_kartu_stok");
-                int saldoSebelum = rs.getInt("saldo");
-                int jumlahKeluarLama = rs.getInt("jumlah_keluar");
-                Date tanggal = rs.getDate("tanggal");
-                String keteranganSebelum = rs.getString("keterangan");
-                
-                // Hitung saldo baru
-                int saldoBaru = saldoSebelum + jumlahMasuk - jumlahKeluar;
+//                int IDKartuStok = rs.getInt("id_kartu_stok");
+                saldoBaru = rs.getInt("stok_bahan");
+//                saldoBaru = saldoSebelum + jumlahMasuk - jumlahKeluar;
+//                int jumlahKeluarLama = rs.getInt("jumlah_keluar");
+//                Date tanggal = rs.getDate("tanggal");
+//                String keteranganSebelum = rs.getString("keterangan");
+            }
 
 //                if (type.equals("transaksi") && keteranganSebelum.equals("Transaksi")) {
 //                    String insertKartuStok = "UPDATE kartu_stok SET jumlah_keluar = ?, saldo = ?"
@@ -42,7 +43,7 @@ public class KartuStok {
 //                        stmtUpdate.setInt(1, jumlahKeluarLama + jumlahKeluar);
 //                        stmtUpdate.setInt(2, saldoBaru);
 //                        stmtUpdate.setInt(3, IDKartuStok);
-//
+//  
 //                        stmtUpdate.executeUpdate();
 //                    }
 //                } else {
@@ -60,7 +61,7 @@ public class KartuStok {
                         stmtInsert.executeUpdate();
                     }
 //                }
-            }
+            
         }
     }
 }

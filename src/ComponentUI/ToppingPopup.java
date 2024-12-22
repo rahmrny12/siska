@@ -5,10 +5,13 @@
 package ComponentUI;
 
 import ComponentUI.Transaction.MenuPanel;
+import Model.Bahan;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -18,61 +21,57 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author LENOVO
  */
-public class BahanPopup extends javax.swing.JFrame {
+public class ToppingPopup extends javax.swing.JFrame {
 
     private Connection conn;
     
-    HashMap<String, String> dataBahan = new HashMap<>();
+    List<Bahan> dataBahan = new ArrayList<>();
     
-    public interface AddBahanListener {
-        void onItemAdded(String IDBahan, int jumlahBahandata);
+    public interface AddToppingListener {
+        void onItemAdded(Bahan bahan, int jumlahBahan);
     }
     
-    private AddBahanListener addBahanListener;
+    private AddToppingListener addBahanListener;
 
-    public void setAddBahanActionListener(AddBahanListener listener) {
+    public void setAddToppingActionListener(AddToppingListener listener) {
         this.addBahanListener = listener;
     }
     
     /**
      * Creates new form PaymentForm
      */
-    public BahanPopup() {
+    public ToppingPopup() {
         initComponents();
         
         this.setLocationRelativeTo(null);
         
         conn = Helper.Database.OpenConnection();
         
-        loadDataBahan();
+        loadDataTopping();
     }
     
-    private void loadDataBahan() {
+    private void loadDataTopping() {
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
         
         try {
-            String query = "SELECT id_bahan, nama_bahan FROM bahan";
+            String query = "SELECT id_bahan, nama_bahan, harga_jual, stok_bahan FROM bahan WHERE topping = true";
             Statement stmt = conn.createStatement();
             ResultSet res = stmt.executeQuery(query);
             
             while (res.next()) {
-                String idBahan = res.getString("id_bahan");
+                int IDBahan = res.getInt("id_bahan");
                 String namaBahan = res.getString("nama_bahan");
+                int harga = res.getInt("harga_jual");
+                int stokBahan = res.getInt("stok_bahan");
 
-                dataBahan.put(idBahan, namaBahan);
+                dataBahan.add(new Bahan(IDBahan, namaBahan, harga, stokBahan));
                 model.addElement(namaBahan);
             }    
             
-            inputBahan.setModel(model);
-            
-            inputBahan.addActionListener(e -> {
-                String selectedNamaBahan = (String) inputBahan.getSelectedItem(); // Nama bahan yang dipilih
-                if (selectedNamaBahan != null) {
-                    String idBahan = dataBahan.get(selectedNamaBahan); // Ambil id_bahan dari HashMap
-                    System.out.println("Selected ID Bahan: " + idBahan);
-                }
-            });
-        } catch (Exception e) {}
+            inputTopping.setModel(model);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Terjadi masalah memuat topping. " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -86,7 +85,7 @@ public class BahanPopup extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel48 = new javax.swing.JLabel();
-        inputBahan = new javax.swing.JComboBox<>();
+        inputTopping = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         inputJumlahBahan = new javax.swing.JSpinner();
 
@@ -99,9 +98,9 @@ public class BahanPopup extends javax.swing.JFrame {
         jLabel48.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel48.setText("Pilih Bahan");
 
-        inputBahan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        inputTopping.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jButton1.setText("Tambah Bahan");
+        jButton1.setText("Tambah Topping");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -120,7 +119,7 @@ public class BahanPopup extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(inputJumlahBahan, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(inputBahan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(inputTopping, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
@@ -129,7 +128,7 @@ public class BahanPopup extends javax.swing.JFrame {
                 .addGap(12, 12, 12)
                 .addComponent(jLabel48, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(inputBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(inputTopping, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(inputJumlahBahan, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(29, 29, 29)
@@ -154,20 +153,24 @@ public class BahanPopup extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String selectedNamaBahan = (String) inputBahan.getSelectedItem();
+        String selectedNamaTopping = (String) inputTopping.getSelectedItem();
         int jumlahBahan = (Integer) inputJumlahBahan.getValue();
         
-        if (selectedNamaBahan != null) {
-            String idBahan = dataBahan.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(selectedNamaBahan))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
-            addBahanListener.onItemAdded(idBahan, jumlahBahan);
+        if (selectedNamaTopping != null) {
+            Bahan selectedBahan = null;
+            for (Bahan bahan : dataBahan) {
+                if (bahan.getNamaBahan().equals(selectedNamaTopping)) {
+                    selectedBahan = bahan;
+                    break;  // Exit loop once the match is found
+                }
+            }
+            
+            int hargaBahan = (Integer) inputJumlahBahan.getValue();
+            addBahanListener.onItemAdded(selectedBahan, jumlahBahan);
             
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Terjadi masalah memilih bahan!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Terjadi masalah memilih topping!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -188,28 +191,30 @@ public class BahanPopup extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(BahanPopup.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ToppingPopup.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(BahanPopup.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ToppingPopup.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(BahanPopup.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ToppingPopup.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(BahanPopup.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ToppingPopup.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new BahanPopup().setVisible(true);
+                new ToppingPopup().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> inputBahan;
     private javax.swing.JSpinner inputJumlahBahan;
+    private javax.swing.JComboBox<String> inputTopping;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel48;
     private javax.swing.JPanel jPanel1;
